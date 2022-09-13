@@ -240,6 +240,8 @@ public class ToolingApiCompatibilityBuildAction implements BuildAction<String> {
             executer.expectDeprecationWarning("Support for running Gradle using Java 6 has been deprecated and will be removed in Gradle 3.0")
         }
 
+        println("Fuck: " + "-Porg.gradle.java.installations.paths=" + AvailableJavaHomes.getAvailableJvms().collect { it.javaHome.absolutePath }.join(","))
+
         when:
         succeeds("buildAction",
                 "-PclientJdk=" + clientJdkVersion.majorVersion,
