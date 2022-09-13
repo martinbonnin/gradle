@@ -198,6 +198,10 @@ public class ToolingApiCompatibilityBuildAction implements BuildAction<String> {
         def gradleDaemonJdk = AvailableJavaHomes.getJdk(gradleDaemonJdkVersion)
         Assume.assumeTrue(tapiClientCompilerJdk && gradleDaemonJdk)
 
+        println("client: ${clientJdkVersion.majorVersion}")
+        println("target: ${gradleDaemonJdk.javaHome.absolutePath}")
+        println("gradleVersion: ${gradleVersion}")
+
         when:
         succeeds("runTask",
                 "-PclientJdk=" + clientJdkVersion.majorVersion,
