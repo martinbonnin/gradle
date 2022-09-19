@@ -42,7 +42,12 @@ class ProjectReportsPluginIntegrationSpec extends AbstractIntegrationSpec {
     def "produces report files in custom directory"() {
         given:
         buildFile << """
-            projectReportDirName = "custom"
+            tasks.withType(ConventionReportTask) {
+                projectReportDirectory = project.layout.buildDirectory.dir('reports/custom')
+            }
+            tasks.withType(HtmlDependencyReportTask) {
+                projectReportDirectory = project.layout.buildDirectory.dir('reports/custom')
+            }
         """
 
         when:
