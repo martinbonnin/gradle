@@ -32,6 +32,9 @@ import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,8 +44,10 @@ public class JUnitTestClassExecutor implements Action<String> {
     private final RunListener listener;
     private final JUnitSpec options;
     private final TestClassExecutionListener executionListener;
+    private final boolean isTestListing;
 
-    public JUnitTestClassExecutor(ClassLoader applicationClassLoader, JUnitSpec spec, RunListener listener, TestClassExecutionListener executionListener) {
+    public JUnitTestClassExecutor(ClassLoader applicationClassLoader, JUnitSpec spec, RunListener listener, TestClassExecutionListener executionListener, boolean isTestListing) {
+        this.isTestListing = isTestListing;
         assert executionListener instanceof ThreadSafe;
         this.applicationClassLoader = applicationClassLoader;
         this.listener = listener;
@@ -80,13 +85,33 @@ public class JUnitTestClassExecutor implements Action<String> {
             || !options.getExcludedTests().isEmpty()) {
             TestSelectionMatcher matcher = new TestSelectionMatcher(
                 options.getIncludedTests(), options.getExcludedTests(),
-                options.getIncludedTestsCommandLine());
+                options.getIncludedTestsCommandLine(), isTestListing);
 
             // For test suites (including suite-like custom Runners), if the test suite class
             // matches the filter, run the entire suite instead of filtering away its contents.
             if (!runner.getDescription().isSuite() || !matcher.matchesTest(testClassName, null)) {
                 filters.add(new MethodNameFilter(matcher));
             }
+        } else {
+            filters.add(new Filter() {
+                @Override
+                public boolean shouldRun(Description description) {
+                    try {
+                        BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/sopivalov/tmp/foo"));
+                        bw.write("Test matches: " + description.getClassName() + "." + description.getMethodName());
+                        System.out.println("Test matches: " + description.getClassName() + "." + description.getMethodName());
+                        bw.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return true;
+                }
+
+                @Override
+                public String describe() {
+                    return "bar";
+                }
+            });
         }
 
         if (runner instanceof Filterable) {

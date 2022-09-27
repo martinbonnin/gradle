@@ -25,6 +25,13 @@ class TestListsIntegrationTest extends AbstractIntegrationSpec {
         buildFile << """
             apply plugin: 'java-library'
             ${mavenCentralRepository()}
+
+test {
+
+            onOutput { descriptor, event ->
+          logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+  }
+}
             dependencies { testImplementation "junit:junit:4.13" }
         """
 
@@ -40,6 +47,6 @@ class TestListsIntegrationTest extends AbstractIntegrationSpec {
         """
 
         expect:
-        succeeds("tasks", "--all")
+        succeeds("test", "--list")
     }
 }

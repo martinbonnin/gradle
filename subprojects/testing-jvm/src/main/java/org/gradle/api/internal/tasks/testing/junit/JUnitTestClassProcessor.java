@@ -26,8 +26,11 @@ import org.gradle.internal.time.Clock;
 
 public class JUnitTestClassProcessor extends AbstractJUnitTestClassProcessor<JUnitSpec> {
 
-    public JUnitTestClassProcessor(JUnitSpec spec, IdGenerator<?> idGenerator, ActorFactory actorFactory, Clock clock) {
+    private boolean isTestListing;
+
+    public JUnitTestClassProcessor(JUnitSpec spec, IdGenerator<?> idGenerator, ActorFactory actorFactory, Clock clock, boolean isTestListing) {
         super(spec, idGenerator, actorFactory, clock);
+        this.isTestListing = isTestListing;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class JUnitTestClassProcessor extends AbstractJUnitTestClassProcessor<JUn
         TestClassExecutionListener threadSafeTestClassListener = resultProcessorActor.getProxy(TestClassExecutionListener.class);
 
         JUnitTestEventAdapter junitEventAdapter = new JUnitTestEventAdapter(threadSafeResultProcessor, clock, idGenerator);
-        return new JUnitTestClassExecutor(Thread.currentThread().getContextClassLoader(), spec, junitEventAdapter, threadSafeTestClassListener);
+        return new JUnitTestClassExecutor(Thread.currentThread().getContextClassLoader(), spec, junitEventAdapter, threadSafeTestClassListener,isTestListing);
     }
 
 }

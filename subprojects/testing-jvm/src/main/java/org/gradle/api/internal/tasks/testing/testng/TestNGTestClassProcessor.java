@@ -54,17 +54,19 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
     private final IdGenerator<?> idGenerator;
     private final Clock clock;
     private final ActorFactory actorFactory;
+    private boolean isTestListing;
     private ClassLoader applicationClassLoader;
     private Actor resultProcessorActor;
     private TestResultProcessor resultProcessor;
 
-    public TestNGTestClassProcessor(File testReportDir, TestNGSpec options, List<File> suiteFiles, IdGenerator<?> idGenerator, Clock clock, ActorFactory actorFactory) {
+    public TestNGTestClassProcessor(File testReportDir, TestNGSpec options, List<File> suiteFiles, IdGenerator<?> idGenerator, Clock clock, ActorFactory actorFactory, boolean isTestListing) {
         this.testReportDir = testReportDir;
         this.options = options;
         this.suiteFiles = suiteFiles;
         this.idGenerator = idGenerator;
         this.clock = clock;
         this.actorFactory = actorFactory;
+        this.isTestListing = isTestListing;
     }
 
     @Override
@@ -208,13 +210,13 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         return factory.createAdapter(listener);
     }
 
-    private static class SelectedTestsFilter implements IMethodInterceptor {
+    private class SelectedTestsFilter implements IMethodInterceptor {
 
         private final TestSelectionMatcher matcher;
 
         public SelectedTestsFilter(Set<String> includedTests, Set<String> excludedTests,
             Set<String> includedTestsCommandLine) {
-            matcher = new TestSelectionMatcher(includedTests, excludedTests, includedTestsCommandLine);
+            matcher = new TestSelectionMatcher(includedTests, excludedTests, includedTestsCommandLine, isTestListing);
         }
 
         @Override

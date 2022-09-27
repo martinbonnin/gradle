@@ -16,6 +16,9 @@
 package org.gradle.api.internal.tasks.testing.filter;
 
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,15 +46,18 @@ public class TestSelectionMatcher {
     private final List<TestPattern> buildScriptIncludePatterns;
     private final List<TestPattern> buildScriptExcludePatterns;
     private final List<TestPattern> commandLineIncludePatterns;
+    private boolean isTestListing;
 
     public TestSelectionMatcher(
         Collection<String> includedTests,
         Collection<String> excludedTests,
-        Collection<String> includedTestsCommandLine
+        Collection<String> includedTestsCommandLine,
+        boolean isTestListing
     ) {
         buildScriptIncludePatterns = preparePatternList(includedTests);
         buildScriptExcludePatterns = preparePatternList(excludedTests);
         commandLineIncludePatterns = preparePatternList(includedTestsCommandLine);
+        this.isTestListing = isTestListing;
     }
 
     private List<TestPattern> preparePatternList(Collection<String> includedTests) {
@@ -63,9 +69,31 @@ public class TestSelectionMatcher {
     }
 
     public boolean matchesTest(String className, String methodName) {
-        return matchesPattern(buildScriptIncludePatterns, className, methodName)
+        boolean isMatches = matchesPattern(buildScriptIncludePatterns, className, methodName)
             && matchesPattern(commandLineIncludePatterns, className, methodName)
             && !matchesExcludePattern(className, methodName);
+
+        if (isTestListing && isMatches) {
+            try {
+                BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/sopivalov/tmp/foo"));
+                bw.write("Test matches: " + className + "." + methodName);
+                System.out.println("Test matches: " + className + "." + methodName);
+                bw.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/sopivalov/tmp/foo"));
+                bw.write("unexpected");
+                System.out.println("Test matches: " + className + "." + methodName);
+                bw.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return !isTestListing && isMatches;
     }
 
     public boolean mayIncludeClass(String fullQualifiedClassName) {
@@ -106,8 +134,10 @@ public class TestSelectionMatcher {
         return false;
     }
 
-    private boolean matchesPattern(List<TestPattern> includePatterns, String className,
-        String methodName) {
+    private boolean matchesPattern(
+        List<TestPattern> includePatterns, String className,
+        String methodName
+    ) {
         if (includePatterns.isEmpty()) {
             return true;
         }
@@ -128,8 +158,10 @@ public class TestSelectionMatcher {
         return matchesClassAndMethod(buildScriptExcludePatterns, className, methodName);
     }
 
-    private boolean matchesClassAndMethod(List<TestPattern> patterns, String className,
-        String methodName) {
+    private boolean matchesClassAndMethod(
+        List<TestPattern> patterns, String className,
+        String methodName
+    ) {
         for (TestPattern pattern : patterns) {
             if (pattern.matchesClassAndMethod(className, methodName)) {
                 return true;
@@ -213,8 +245,10 @@ public class TestSelectionMatcher {
             return index == segments.length - 2 && index == className.length - 1 && classNameMatch(className[index], segments[index]);
         }
 
-        private boolean lastClassNameElementMatchesLastPatternElement(String[] className,
-            int index) {
+        private boolean lastClassNameElementMatchesLastPatternElement(
+            String[] className,
+            int index
+        ) {
             return index == segments.length - 1 && lastElementMatcher.match(className[index],
                 segments[index]);
         }

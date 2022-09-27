@@ -101,6 +101,7 @@ import java.util.Map;
  */
 @DisableCachingByDefault(because = "Abstract super-class, not to be instantiated directly")
 public abstract class AbstractTestTask extends ConventionTask implements VerificationTask, Reporting<TestTaskReports> {
+    public boolean isTestListing = false;
     private final DefaultTestFilter filter;
     private final TestTaskReports reports;
     private final ListenerBroadcast<TestListener> testListenerBroadcaster;
@@ -548,6 +549,12 @@ public abstract class AbstractTestTask extends ConventionTask implements Verific
     @Option(option = "tests", description = "Sets test class or method name to be included, '*' is supported.")
     public AbstractTestTask setTestNameIncludePatterns(List<String> testNamePattern) {
         filter.setCommandLineIncludePatterns(testNamePattern);
+        return this;
+    }
+
+    @Option(option = "list", description = "Sets test class or method name to be included, '*' is supported.")
+    public AbstractTestTask setTestListing(boolean isTestListing) {
+        this.isTestListing = isTestListing;
         return this;
     }
 

@@ -49,6 +49,7 @@ import java.util.concurrent.Callable;
 @UsedByScanPlugin("test-retry")
 public class TestNGTestFramework implements TestFramework {
     private final TestNGOptions options;
+    private boolean isTestListing;
     private TestNGDetector detector;
     private final DefaultTestFilter filter;
     private final ObjectFactory objects;
@@ -58,13 +59,14 @@ public class TestNGTestFramework implements TestFramework {
     private transient ClassLoader testClassLoader;
 
     @UsedByScanPlugin("test-retry")
-    public TestNGTestFramework(final Test testTask, FileCollection classpath, DefaultTestFilter filter, ObjectFactory objects) {
+    public TestNGTestFramework(final Test testTask, FileCollection classpath, DefaultTestFilter filter, ObjectFactory objects, boolean isTestListing) {
         this.filter = filter;
         this.objects = objects;
         this.testTaskPath = testTask.getPath();
         this.testTaskClasspath = classpath;
         this.testTaskTemporaryDir = testTask.getTemporaryDirFactory();
         options = objects.newInstance(TestNGOptions.class);
+        this.isTestListing = isTestListing;
         conventionMapOutputDirectory(options, testTask.getReports().getHtml());
         detector = new TestNGDetector(new ClassFileExtractionManager(testTask.getTemporaryDirFactory()));
     }
@@ -85,7 +87,7 @@ public class TestNGTestFramework implements TestFramework {
         verifyGroupByInstances();
         List<File> suiteFiles = options.getSuites(testTaskTemporaryDir.create());
         TestNGSpec spec = new TestNGSpec(options, filter);
-        return new TestClassProcessorFactoryImpl(this.options.getOutputDirectory(), spec, suiteFiles);
+        return new TestClassProcessorFactoryImpl(this.options.getOutputDirectory(), spec, suiteFiles, isTestListing);
     }
 
     private void verifyConfigFailurePolicy() {
@@ -206,16 +208,18 @@ public class TestNGTestFramework implements TestFramework {
         private final File testReportDir;
         private final TestNGSpec options;
         private final List<File> suiteFiles;
+        private boolean isTestListing;
 
-        public TestClassProcessorFactoryImpl(File testReportDir, TestNGSpec options, List<File> suiteFiles) {
+        public TestClassProcessorFactoryImpl(File testReportDir, TestNGSpec options, List<File> suiteFiles, boolean isTestListing) {
             this.testReportDir = testReportDir;
             this.options = options;
             this.suiteFiles = suiteFiles;
+            this.isTestListing = isTestListing;
         }
 
         @Override
         public TestClassProcessor create(ServiceRegistry serviceRegistry) {
-            return new TestNGTestClassProcessor(testReportDir, options, suiteFiles, serviceRegistry.get(IdGenerator.class), serviceRegistry.get(Clock.class), serviceRegistry.get(ActorFactory.class));
+            return new TestNGTestClassProcessor(testReportDir, options, suiteFiles, serviceRegistry.get(IdGenerator.class), serviceRegistry.get(Clock.class), serviceRegistry.get(ActorFactory.class), isTestListing);
         }
     }
 }
