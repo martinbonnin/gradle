@@ -177,6 +177,7 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
     private boolean userHasConfiguredTestFramework;
     private boolean optionsAccessed;
 
+    private boolean isDryRun = false;
     private boolean scanForTestClasses = true;
     private long forkEvery;
     private int maxParallelForks = 1;
@@ -198,7 +199,7 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
         forkOptions.setExecutable(null);
         modularity = getObjectFactory().newInstance(DefaultModularitySpec.class);
         javaLauncher = getObjectFactory().property(JavaLauncher.class);
-        testFramework = getObjectFactory().property(TestFramework.class).convention(new JUnitTestFramework(this, (DefaultTestFilter) getFilter(), true, isTestListing));
+        testFramework = getObjectFactory().property(TestFramework.class).convention(new JUnitTestFramework(this, (DefaultTestFilter) getFilter(), true));
     }
 
     @Inject
@@ -268,6 +269,17 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
     public Test workingDir(Object dir) {
         forkOptions.workingDir(dir);
         return this;
+    }
+
+    @Option(option = "dry-run-tests", description = "Sets test class or method name to be included, '*' is supported.")
+    public AbstractTestTask setDryRun(boolean isDryRun) {
+        this.isDryRun = isDryRun;
+        return this;
+    }
+
+    @Internal
+    public boolean isDryRun() {
+        return isDryRun;
     }
 
     /**
@@ -648,7 +660,7 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
         boolean testIsModule = javaModuleDetector.isModule(modularity.getInferModulePath().get(), getTestClassesDirs());
         FileCollection classpath = javaModuleDetector.inferClasspath(testIsModule, stableClasspath);
         FileCollection modulePath = javaModuleDetector.inferModulePath(testIsModule, stableClasspath);
-        return new JvmTestExecutionSpec(getTestFramework(), classpath, modulePath, getCandidateClassFiles(), isScanForTestClasses(), getTestClassesDirs(), getPath(), getIdentityPath(), getForkEvery(), javaForkOptions, getMaxParallelForks(), getPreviousFailedTestClasses());
+        return new JvmTestExecutionSpec(getTestFramework(), classpath, modulePath, getCandidateClassFiles(), isScanForTestClasses(), getTestClassesDirs(), getPath(), getIdentityPath(), getForkEvery(), javaForkOptions, getMaxParallelForks(), getPreviousFailedTestClasses(), isDryRun);
     }
 
     private void validateToolchainConfiguration() {
@@ -706,8 +718,7 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
                 getServices().get(StartParameter.class).getMaxWorkerCount(),
                 getServices().get(Clock.class),
                 getServices().get(DocumentationRegistry.class),
-                (DefaultTestFilter) getFilter(),
-                true
+                (DefaultTestFilter) getFilter()
                 );
         } else {
             return testExecuter;
@@ -1043,7 +1054,7 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
      * @since 3.5
      */
     public void useJUnit(Action<? super JUnitOptions> testFrameworkConfigure) {
-        useTestFramework(new JUnitTestFramework(this, (DefaultTestFilter) getFilter(), true, isTestListing), testFrameworkConfigure);
+        useTestFramework(new JUnitTestFramework(this, (DefaultTestFilter) getFilter(), true), testFrameworkConfigure);
     }
 
     /**
@@ -1107,7 +1118,7 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
      * @since 3.5
      */
     public void useTestNG(Action<? super TestNGOptions> testFrameworkConfigure) {
-        useTestFramework(new TestNGTestFramework(this, stableClasspath, (DefaultTestFilter) getFilter(), getObjectFactory(), isTestListing), testFrameworkConfigure);
+        useTestFramework(new TestNGTestFramework(this, stableClasspath, (DefaultTestFilter) getFilter(), getObjectFactory()), testFrameworkConfigure);
     }
 
     /**

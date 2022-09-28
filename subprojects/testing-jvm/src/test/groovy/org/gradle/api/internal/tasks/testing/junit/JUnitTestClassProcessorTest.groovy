@@ -39,7 +39,7 @@ class JUnitTestClassProcessorTest extends Specification {
     @Subject classProcessor = withSpec(spec)
 
     JUnitTestClassProcessor withSpec(spec) {
-        new JUnitTestClassProcessor(spec, new LongIdGenerator(), new TestActorFactory(), Time.clock(), isTestListing)
+        new JUnitTestClassProcessor(spec, new LongIdGenerator(), new TestActorFactory(), Time.clock(), isTestListing, isDryRun)
     }
 
     void process(Class... clazz) {

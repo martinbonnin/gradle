@@ -41,13 +41,15 @@ public class JvmTestExecutionSpec implements TestExecutionSpec {
     private final int maxParallelForks;
     private final Set<String> previousFailedTestClasses;
 
+    private final boolean isDryRun;
+
     @UsedByScanPlugin("test-retry <= 1.1.3")
-    public JvmTestExecutionSpec(TestFramework testFramework, Iterable<? extends File> classpath, FileTree candidateClassFiles, boolean scanForTestClasses, FileCollection testClassesDirs, String path, Path identityPath, long forkEvery, JavaForkOptions javaForkOptions, int maxParallelForks, Set<String> previousFailedTestClasses) {
-        this(testFramework, classpath, Collections.<File>emptyList(), candidateClassFiles, scanForTestClasses, testClassesDirs, path, identityPath, forkEvery, javaForkOptions, maxParallelForks, previousFailedTestClasses);
+    public JvmTestExecutionSpec(TestFramework testFramework, Iterable<? extends File> classpath, FileTree candidateClassFiles, boolean scanForTestClasses, FileCollection testClassesDirs, String path, Path identityPath, long forkEvery, JavaForkOptions javaForkOptions, int maxParallelForks, Set<String> previousFailedTestClasses, boolean isDryRun) {
+        this(testFramework, classpath, Collections.<File>emptyList(), candidateClassFiles, scanForTestClasses, testClassesDirs, path, identityPath, forkEvery, javaForkOptions, maxParallelForks, previousFailedTestClasses, isDryRun);
     }
 
     @UsedByScanPlugin("test-retry")
-    public JvmTestExecutionSpec(TestFramework testFramework, Iterable<? extends File> classpath, Iterable<? extends File>  modulePath, FileTree candidateClassFiles, boolean scanForTestClasses, FileCollection testClassesDirs, String path, Path identityPath, long forkEvery, JavaForkOptions javaForkOptions, int maxParallelForks, Set<String> previousFailedTestClasses) {
+    public JvmTestExecutionSpec(TestFramework testFramework, Iterable<? extends File> classpath, Iterable<? extends File> modulePath, FileTree candidateClassFiles, boolean scanForTestClasses, FileCollection testClassesDirs, String path, Path identityPath, long forkEvery, JavaForkOptions javaForkOptions, int maxParallelForks, Set<String> previousFailedTestClasses, boolean isDryRun) {
         this.testFramework = testFramework;
         this.classpath = classpath;
         this.modulePath = modulePath;
@@ -60,6 +62,12 @@ public class JvmTestExecutionSpec implements TestExecutionSpec {
         this.javaForkOptions = javaForkOptions;
         this.maxParallelForks = maxParallelForks;
         this.previousFailedTestClasses = previousFailedTestClasses;
+        this.isDryRun = isDryRun;
+    }
+
+    @Override
+    public boolean isDryRun() {
+        return isDryRun;
     }
 
     public TestFramework getTestFramework() {

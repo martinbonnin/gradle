@@ -28,6 +28,8 @@ class TestListsIntegrationTest extends AbstractIntegrationSpec {
 
 test {
 
+//            jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005'
+            useJUnit()
             onOutput { descriptor, event ->
           logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
   }
@@ -41,12 +43,14 @@ test {
 
             public class SomeTest {
                 @Test public void foo() {
-                    Thread.currentThread().interrupt();
+                    throw new RuntimeException();
                 }
             }
         """
 
         expect:
-        succeeds("test", "--list")
+        succeeds("test", "--dry-run-tests", "--info")
+        println(testDirectory.absolutePath)
+        System.exit(0)
     }
 }

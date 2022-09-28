@@ -26,10 +26,10 @@ public class PatternMatchTestClassProcessor implements TestClassProcessor {
     private final TestSelectionMatcher testClassSelectionMatcher;
     private final TestClassProcessor delegate;
 
-    public PatternMatchTestClassProcessor(DefaultTestFilter testFilter, TestClassProcessor delegate, boolean isTestListing) {
+    public PatternMatchTestClassProcessor(DefaultTestFilter testFilter, TestClassProcessor delegate) {
         this.testClassSelectionMatcher = new TestSelectionMatcher(
             testFilter.getIncludePatterns(), testFilter.getExcludePatterns(),
-            testFilter.getCommandLineIncludePatterns(), isTestListing);
+            testFilter.getCommandLineIncludePatterns());
         this.delegate = delegate;
     }
 

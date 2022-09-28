@@ -46,7 +46,6 @@ import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskDependency;
-import org.gradle.api.tasks.testing.AbstractTestTask;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -182,20 +181,20 @@ public abstract class DefaultJvmTestSuite implements JvmTestSuite {
                 task.getTestFrameworkProperty().convention(getVersionedTestingFramework().map(vtf -> {
                     switch (vtf.getFramework()) {
                         case JUNIT4:
-                            return frameworkLookup.computeIfAbsent(vtf.getFramework(), f -> new JUnitTestFramework(task, (DefaultTestFilter) task.getFilter(), false, task.isTestListing));
+                            return frameworkLookup.computeIfAbsent(vtf.getFramework(), f -> new JUnitTestFramework(task, (DefaultTestFilter) task.getFilter(), false));
                         case KOTLIN_TEST: // fall-through
                         case JUNIT_JUPITER: // fall-through
                         case JUNIT_PLATFORM: // fall-through
                         case SPOCK:
                             return frameworkLookup.computeIfAbsent(vtf.getFramework(), f -> new JUnitPlatformTestFramework((DefaultTestFilter) task.getFilter(), false));
                         case TESTNG:
-                            return frameworkLookup.computeIfAbsent(vtf.getFramework(), f -> new TestNGTestFramework(task, task.getClasspath(), (DefaultTestFilter) task.getFilter(), getObjectFactory(), task.isTestListing));
+                            return frameworkLookup.computeIfAbsent(vtf.getFramework(), f -> new TestNGTestFramework(task, task.getClasspath(), (DefaultTestFilter) task.getFilter(), getObjectFactory()));
                         default:
                             throw new IllegalStateException("do not know how to handle " + vtf);
                     }
                     // In order to maintain compatibility for the default test suite, we need to load JUnit4 from the Gradle distribution
                     // instead of including it in testImplementation.
-                }).orElse(new DefaultProvider<>(() -> frameworkLookup.computeIfAbsent(null, f -> new JUnitTestFramework(task, (DefaultTestFilter) task.getFilter(), true, task.isTestListing)))));
+                }).orElse(new DefaultProvider<>(() -> frameworkLookup.computeIfAbsent(null, f -> new JUnitTestFramework(task, (DefaultTestFilter) task.getFilter(), true)))));
             });
         });
     }

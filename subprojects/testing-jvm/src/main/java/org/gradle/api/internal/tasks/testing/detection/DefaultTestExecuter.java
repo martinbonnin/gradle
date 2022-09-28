@@ -61,14 +61,12 @@ public class DefaultTestExecuter implements TestExecuter<JvmTestExecutionSpec> {
     private final Clock clock;
     private final DocumentationRegistry documentationRegistry;
     private final DefaultTestFilter testFilter;
-    private boolean isTestListing;
     private TestClassProcessor processor;
 
     public DefaultTestExecuter(
         WorkerProcessFactory workerFactory, ActorFactory actorFactory, ModuleRegistry moduleRegistry,
         WorkerLeaseService workerLeaseService, int maxWorkerCount,
-        Clock clock, DocumentationRegistry documentationRegistry, DefaultTestFilter testFilter,
-        boolean isTestListing
+        Clock clock, DocumentationRegistry documentationRegistry, DefaultTestFilter testFilter
     ) {
         this.workerFactory = workerFactory;
         this.actorFactory = actorFactory;
@@ -78,7 +76,6 @@ public class DefaultTestExecuter implements TestExecuter<JvmTestExecutionSpec> {
         this.clock = clock;
         this.documentationRegistry = documentationRegistry;
         this.testFilter = testFilter;
-        this.isTestListing = isTestListing;
     }
 
     @Override
@@ -120,8 +117,7 @@ public class DefaultTestExecuter implements TestExecuter<JvmTestExecutionSpec> {
         processor =
             new PatternMatchTestClassProcessor(testFilter,
                 new RunPreviousFailedFirstTestClassProcessor(testExecutionSpec.getPreviousFailedTestClasses(),
-                    new MaxNParallelTestClassProcessor(getMaxParallelForks(testExecutionSpec), reforkingProcessorFactory, actorFactory)),
-                isTestListing
+                    new MaxNParallelTestClassProcessor(getMaxParallelForks(testExecutionSpec), reforkingProcessorFactory, actorFactory))
                 );
 
         final FileTree testClassFiles = testExecutionSpec.getCandidateClassFiles();
@@ -136,7 +132,7 @@ public class DefaultTestExecuter implements TestExecuter<JvmTestExecutionSpec> {
             detector = new DefaultTestClassScanner(testClassFiles, null, processor);
         }
 
-        new TestMainAction(detector, processor, testResultProcessor, workerLeaseService, clock, testExecutionSpec.getPath(), "Gradle Test Run " + testExecutionSpec.getIdentityPath()).run();
+        new TestMainAction(detector, processor, testResultProcessor, workerLeaseService, clock, testExecutionSpec.getPath(), "Gradle Test Run " + testExecutionSpec.getIdentityPath(), testExecutionSpec.isDryRun()).run();
     }
 
     @Override

@@ -51,4 +51,9 @@ public class XCTestTestExecutionSpec implements TestExecutionSpec {
     public XCTestSelection getTestSelection() {
         return testSelection;
     }
+
+    @Override
+    public boolean isDryRun() {
+        return false;
+    }
 }

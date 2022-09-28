@@ -18,12 +18,14 @@ package org.gradle.api.internal.tasks.testing.junit;
 
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
+import org.gradle.api.internal.tasks.testing.TestResultProcessor;
 import org.gradle.api.internal.tasks.testing.filter.TestSelectionMatcher;
 import org.gradle.api.tasks.testing.TestFailure;
 import org.gradle.internal.concurrent.ThreadSafe;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.Description;
 import org.junit.runner.Request;
+import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
@@ -32,9 +34,6 @@ import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,15 +43,18 @@ public class JUnitTestClassExecutor implements Action<String> {
     private final RunListener listener;
     private final JUnitSpec options;
     private final TestClassExecutionListener executionListener;
-    private final boolean isTestListing;
 
-    public JUnitTestClassExecutor(ClassLoader applicationClassLoader, JUnitSpec spec, RunListener listener, TestClassExecutionListener executionListener, boolean isTestListing) {
-        this.isTestListing = isTestListing;
+    private final TestResultProcessor threadSafeResultProcessor;
+    private final boolean isDryRun;
+
+    public JUnitTestClassExecutor(ClassLoader applicationClassLoader, JUnitSpec spec, RunListener listener, TestClassExecutionListener executionListener, TestResultProcessor threadSafeResultProcessor, boolean isDryRun) {
+        this.threadSafeResultProcessor = threadSafeResultProcessor;
         assert executionListener instanceof ThreadSafe;
         this.applicationClassLoader = applicationClassLoader;
         this.listener = listener;
         this.options = spec;
         this.executionListener = executionListener;
+        this.isDryRun = isDryRun;
     }
 
     @Override
@@ -85,33 +87,13 @@ public class JUnitTestClassExecutor implements Action<String> {
             || !options.getExcludedTests().isEmpty()) {
             TestSelectionMatcher matcher = new TestSelectionMatcher(
                 options.getIncludedTests(), options.getExcludedTests(),
-                options.getIncludedTestsCommandLine(), isTestListing);
+                options.getIncludedTestsCommandLine());
 
             // For test suites (including suite-like custom Runners), if the test suite class
             // matches the filter, run the entire suite instead of filtering away its contents.
             if (!runner.getDescription().isSuite() || !matcher.matchesTest(testClassName, null)) {
                 filters.add(new MethodNameFilter(matcher));
             }
-        } else {
-            filters.add(new Filter() {
-                @Override
-                public boolean shouldRun(Description description) {
-                    try {
-                        BufferedWriter bw = new BufferedWriter(new FileWriter("/Users/sopivalov/tmp/foo"));
-                        bw.write("Test matches: " + description.getClassName() + "." + description.getMethodName());
-                        System.out.println("Test matches: " + description.getClassName() + "." + description.getMethodName());
-                        bw.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return true;
-                }
-
-                @Override
-                public String describe() {
-                    return "bar";
-                }
-            });
         }
 
         if (runner instanceof Filterable) {
@@ -129,8 +111,23 @@ public class JUnitTestClassExecutor implements Action<String> {
         }
 
         RunNotifier notifier = new RunNotifier();
-        notifier.addListener(listener);
-        runner.run(notifier);
+
+        if (true) {
+            try {
+                listener.testSuiteStarted(Description.createSuiteDescription("1"));
+                listener.testRunStarted(Description.createSuiteDescription("2"));
+                listener.testStarted(Description.createSuiteDescription("3"));
+                listener.testFinished(Description.createSuiteDescription("4"));
+                listener.testRunStarted(Description.createSuiteDescription("5"));
+                listener.testRunFinished(new Result());
+                listener.testSuiteFinished(Description.createSuiteDescription("7"));
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        } else {
+            notifier.addListener(listener);
+            runner.run(notifier);
+        }
     }
 
     // https://github.com/gradle/gradle/issues/2319

@@ -18,4 +18,5 @@ package org.gradle.api.internal.tasks.testing;
 
 public interface TestExecutionSpec {
 
+    boolean isDryRun();
 }

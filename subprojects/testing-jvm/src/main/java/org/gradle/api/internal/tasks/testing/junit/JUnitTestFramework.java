@@ -42,12 +42,13 @@ public class JUnitTestFramework implements TestFramework {
     private JUnitDetector detector;
     private final DefaultTestFilter filter;
     private final boolean useImplementationDependencies;
-    private boolean isTestListing;
 
-    public JUnitTestFramework(Test testTask, DefaultTestFilter filter, boolean useImplementationDependencies, boolean isTestListing) {
+    private final boolean isDryRun;
+
+    public JUnitTestFramework(Test testTask, DefaultTestFilter filter, boolean useImplementationDependencies) {
         this.filter = filter;
         this.useImplementationDependencies = useImplementationDependencies;
-        this.isTestListing = isTestListing;
+        this.isDryRun = testTask.isDryRun();
         options = new JUnitOptions();
         detector = new JUnitDetector(new ClassFileExtractionManager(testTask.getTemporaryDirFactory()));
     }
@@ -58,7 +59,7 @@ public class JUnitTestFramework implements TestFramework {
             options.getIncludeCategories(), options.getExcludeCategories(),
             filter.getIncludePatterns(), filter.getExcludePatterns(),
             filter.getCommandLineIncludePatterns()),
-            isTestListing);
+            isDryRun);
     }
 
     @Override
@@ -111,16 +112,16 @@ public class JUnitTestFramework implements TestFramework {
 
     private static class TestClassProcessorFactoryImpl implements WorkerTestClassProcessorFactory, Serializable {
         private final JUnitSpec spec;
-        private boolean isTestListing;
+        private final boolean isDryRun;
 
-        public TestClassProcessorFactoryImpl(JUnitSpec spec, boolean isTestListing) {
+        public TestClassProcessorFactoryImpl(JUnitSpec spec, boolean isDryRun) {
+            this.isDryRun = isDryRun;
             this.spec = spec;
-            this.isTestListing = isTestListing;
         }
 
         @Override
         public TestClassProcessor create(ServiceRegistry serviceRegistry) {
-            return new JUnitTestClassProcessor(spec, serviceRegistry.get(IdGenerator.class), serviceRegistry.get(ActorFactory.class), serviceRegistry.get(Clock.class), isTestListing);
+            return new JUnitTestClassProcessor(spec, serviceRegistry.get(IdGenerator.class), serviceRegistry.get(ActorFactory.class), serviceRegistry.get(Clock.class), isDryRun);
         }
     }
 }
