@@ -75,6 +75,7 @@ public class JUnitTestClassExecutor implements Action<String> {
         Request request = Request.aClass(testClass);
         Runner runner = request.getRunner();
 
+        org.junit.runner.manipulation.Filter testFilter = new MatchesAllFilter();
         if (!options.getIncludedTests().isEmpty()
             || !options.getIncludedTestsCommandLine().isEmpty()
             || !options.getExcludedTests().isEmpty()) {
@@ -85,9 +86,12 @@ public class JUnitTestClassExecutor implements Action<String> {
             // For test suites (including suite-like custom Runners), if the test suite class
             // matches the filter, run the entire suite instead of filtering away its contents.
             if (!runner.getDescription().isSuite() || !matcher.matchesTest(testClassName, null)) {
-                filters.add(new MethodNameFilter(matcher));
+                testFilter = new MethodNameFilter(matcher);
             }
         }
+
+        IncludedMethodNameCollectingFilter collectingFilter = new IncludedMethodNameCollectingFilter(testFilter);
+        filters.add(collectingFilter);
 
         if (runner instanceof Filterable) {
             Filterable filterable = (Filterable) runner;
@@ -103,9 +107,20 @@ public class JUnitTestClassExecutor implements Action<String> {
             return;
         }
 
-        RunNotifier notifier = new RunNotifier();
-        notifier.addListener(listener);
-        runner.run(notifier);
+        if (true) { // TODO replace with if (dryRun) {
+            try {
+                for (Description includedTest : collectingFilter.includedTests) {
+                    listener.testStarted(includedTest);
+                    listener.testFinished(includedTest);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            RunNotifier notifier = new RunNotifier();
+            notifier.addListener(listener);
+            runner.run(notifier);
+        }
     }
 
     // https://github.com/gradle/gradle/issues/2319
@@ -177,6 +192,43 @@ public class JUnitTestClassExecutor implements Action<String> {
         @Override
         public String describe() {
             return "Includes matching test methods";
+        }
+    }
+
+    private static class IncludedMethodNameCollectingFilter extends org.junit.runner.manipulation.Filter {
+
+        private final Filter delegate;
+        private final List<Description> includedTests = new ArrayList<Description>();
+
+        IncludedMethodNameCollectingFilter(org.junit.runner.manipulation.Filter delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public boolean shouldRun(Description description) {
+            boolean result = delegate.shouldRun(description);
+            if (result) {
+                includedTests.add(description);
+            }
+            return result;
+        }
+
+        @Override
+        public String describe() {
+            return "Collects included tests";
+        }
+    }
+
+    private static class MatchesAllFilter extends org.junit.runner.manipulation.Filter {
+
+        @Override
+        public boolean shouldRun(Description description) {
+            return true;
+        }
+
+        @Override
+        public String describe() {
+            return "Matches all";
         }
     }
 }
