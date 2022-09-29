@@ -55,7 +55,7 @@ public class JUnitTestFramework implements TestFramework {
         return new TestClassProcessorFactoryImpl(new JUnitSpec(
             options.getIncludeCategories(), options.getExcludeCategories(),
             filter.getIncludePatterns(), filter.getExcludePatterns(),
-            filter.getCommandLineIncludePatterns()));
+            filter.getCommandLineIncludePatterns(), options.isDryRun()));
     }
 
     @Override

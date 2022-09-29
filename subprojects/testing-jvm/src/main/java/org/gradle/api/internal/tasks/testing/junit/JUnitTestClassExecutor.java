@@ -107,7 +107,7 @@ public class JUnitTestClassExecutor implements Action<String> {
             return;
         }
 
-        if (true) { // TODO replace with if (dryRun) {
+        if (options.isDryRun()) {
             try {
                 for (Description includedTest : collectingFilter.includedTests) {
                     listener.testStarted(includedTest);

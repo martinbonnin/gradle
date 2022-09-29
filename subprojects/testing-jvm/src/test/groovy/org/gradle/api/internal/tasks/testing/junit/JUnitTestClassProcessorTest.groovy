@@ -34,7 +34,7 @@ class JUnitTestClassProcessorTest extends Specification {
     @Rule TestNameTestDirectoryProvider tmp = new TestNameTestDirectoryProvider(getClass())
 
     def processor = Mock(TestResultProcessor)
-    def spec = new JUnitSpec([] as Set, [] as Set, [] as Set, [] as Set, [] as Set)
+    def spec = new JUnitSpec([] as Set, [] as Set, [] as Set, [] as Set, [] as Set, false)
 
     @Subject classProcessor = withSpec(spec)
 
@@ -249,7 +249,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "executes specific method"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, [ATestClassWithSeveralMethods.name + ".pass"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, [ATestClassWithSeveralMethods.name + ".pass"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(ATestClassWithSeveralMethods)
@@ -265,7 +265,7 @@ class JUnitTestClassProcessorTest extends Specification {
     def "executes multiple specific methods"() {
         setup:
         classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, [ATestClassWithSeveralMethods.name + ".pass",
-                ATestClassWithSeveralMethods.name + ".pass2"] as Set, [] as Set, [] as Set))
+                                                                       ATestClassWithSeveralMethods.name + ".pass2"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(ATestClassWithSeveralMethods)
@@ -279,7 +279,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "executes methods from multiple classes by pattern"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*Methods.*Slowly*"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*Methods.*Slowly*"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(ATestClassWithSeveralMethods, ATestClassWithSlowMethods, ATestClass)
@@ -296,7 +296,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "executes all tests for class with test runner that is not filterable when any test description matches"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, [ATestClassWithRunner.name + ".ok"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, [ATestClassWithRunner.name + ".ok"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(ATestClassWithRunner)
@@ -314,7 +314,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "does not execute class with test runner that is not filterable when no test description matches"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, [ATestClassWithRunner.name + ".ignoreme"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, [ATestClassWithRunner.name + ".ignoreme"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(ATestClassWithRunner)
@@ -327,7 +327,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "executes no methods when method name does not match"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["does not exist"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["does not exist"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(ATestClassWithSeveralMethods)
@@ -340,7 +340,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "executes all tests within a JUnit 3 suite when the suite class name matches"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*ATestClassWithSuiteMethod"] as Set,[] as Set,  [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*ATestClassWithSuiteMethod"] as Set, [] as Set, [] as Set, false))
 
         //Run tests in ATestClassWithSuiteMethod only
         when:
@@ -360,7 +360,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "executes all tests within a suite when the suite class name matches"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*ATestSuite"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*ATestSuite"] as Set, [] as Set, [] as Set, false))
 
         //Run tests in ATestSuite only
         when:
@@ -382,7 +382,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "executes all tests within a custom runner suite class name matches"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*ACustomSuite"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*ACustomSuite"] as Set, [] as Set, [] as Set, false))
 
         //Run tests in ATestSuite only
         when:
@@ -404,7 +404,7 @@ class JUnitTestClassProcessorTest extends Specification {
 
     def "attempting to filter methods on a suite does NOT work"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*ATestSuite.ok*"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*ATestSuite.ok*"] as Set, [] as Set, [] as Set, false))
 
         //Doesn't run any tests
         when:
@@ -421,7 +421,7 @@ class JUnitTestClassProcessorTest extends Specification {
     @Issue("GRADLE-3112")
     def "has no errors when dealing with an empty suite"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AnEmptyTestSuite"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AnEmptyTestSuite"] as Set, [] as Set, [] as Set, false))
 
         //Run tests in AnEmptyTestSuite (e.g. no tests)
         when:
@@ -436,7 +436,7 @@ class JUnitTestClassProcessorTest extends Specification {
     @Issue("GRADLE-3112")
     def "parameterized tests can be run with a class-level filter"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AParameterizedTest"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AParameterizedTest"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(AParameterizedTest)
@@ -458,7 +458,7 @@ class JUnitTestClassProcessorTest extends Specification {
     @Issue("GRADLE-3112")
     def "parameterized tests can be filtered by method name"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AParameterizedTest.helpfulTest*"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AParameterizedTest.helpfulTest*"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(AParameterizedTest)
@@ -476,7 +476,7 @@ class JUnitTestClassProcessorTest extends Specification {
     @Issue("GRADLE-3112")
     def "parameterized tests can be filtered by iteration only."() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AParameterizedTest.*[1]"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AParameterizedTest.*[1]"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(AParameterizedTest)
@@ -494,7 +494,7 @@ class JUnitTestClassProcessorTest extends Specification {
     @Issue("GRADLE-3112")
     def "parameterized tests can be filtered by full method name"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AParameterizedTest.helpfulTest[1]"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AParameterizedTest.helpfulTest[1]"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(AParameterizedTest)
@@ -510,7 +510,7 @@ class JUnitTestClassProcessorTest extends Specification {
     @Issue("GRADLE-3112")
     def "parameterized tests can be empty"() {
         setup:
-        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AnEmptyParameterizedTest"] as Set, [] as Set, [] as Set))
+        classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, ["*AnEmptyParameterizedTest"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(AnEmptyParameterizedTest)
