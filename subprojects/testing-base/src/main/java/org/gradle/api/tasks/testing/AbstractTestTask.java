@@ -53,8 +53,10 @@ import org.gradle.api.internal.tasks.testing.results.StateTrackingTestResultProc
 import org.gradle.api.internal.tasks.testing.results.TestListenerAdapter;
 import org.gradle.api.internal.tasks.testing.results.TestListenerInternal;
 import org.gradle.api.logging.LogLevel;
+import org.gradle.api.provider.Property;
 import org.gradle.api.reporting.DirectoryReport;
 import org.gradle.api.reporting.Reporting;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.OutputDirectory;
@@ -111,6 +113,7 @@ public abstract class AbstractTestTask extends ConventionTask implements Verific
     private TestReporter testReporter;
     private boolean ignoreFailures;
     private boolean failFast;
+    private Property<Boolean> dryRun;
 
     public AbstractTestTask() {
         Instantiator instantiator = getInstantiator();
@@ -126,6 +129,13 @@ public abstract class AbstractTestTask extends ConventionTask implements Verific
         reports.getHtml().getRequired().set(true);
 
         filter = instantiator.newInstance(DefaultTestFilter.class);
+        dryRun = getProject().getObjects().property(Boolean.class).convention(false);
+    }
+
+    @Input
+    @Option(option = "test-dry-run", description = "Simulate test execution.")
+    public Property<Boolean> getDryRun() {
+        return dryRun;
     }
 
     @Inject
