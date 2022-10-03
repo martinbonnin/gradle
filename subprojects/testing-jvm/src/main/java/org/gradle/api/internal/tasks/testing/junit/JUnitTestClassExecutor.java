@@ -18,14 +18,12 @@ package org.gradle.api.internal.tasks.testing.junit;
 
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
-import org.gradle.api.internal.tasks.testing.TestResultProcessor;
 import org.gradle.api.internal.tasks.testing.filter.TestSelectionMatcher;
 import org.gradle.api.tasks.testing.TestFailure;
 import org.gradle.internal.concurrent.ThreadSafe;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.Description;
 import org.junit.runner.Request;
-import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runner.Runner;
 import org.junit.runner.manipulation.Filter;
@@ -44,17 +42,12 @@ public class JUnitTestClassExecutor implements Action<String> {
     private final JUnitSpec options;
     private final TestClassExecutionListener executionListener;
 
-    private final TestResultProcessor threadSafeResultProcessor;
-    private final boolean isDryRun;
-
-    public JUnitTestClassExecutor(ClassLoader applicationClassLoader, JUnitSpec spec, RunListener listener, TestClassExecutionListener executionListener, TestResultProcessor threadSafeResultProcessor, boolean isDryRun) {
-        this.threadSafeResultProcessor = threadSafeResultProcessor;
+    public JUnitTestClassExecutor(ClassLoader applicationClassLoader, JUnitSpec spec, RunListener listener, TestClassExecutionListener executionListener) {
         assert executionListener instanceof ThreadSafe;
         this.applicationClassLoader = applicationClassLoader;
         this.listener = listener;
         this.options = spec;
         this.executionListener = executionListener;
-        this.isDryRun = isDryRun;
     }
 
     @Override
@@ -82,6 +75,7 @@ public class JUnitTestClassExecutor implements Action<String> {
         Request request = Request.aClass(testClass);
         Runner runner = request.getRunner();
 
+        org.junit.runner.manipulation.Filter testFilter = new MatchesAllFilter();
         if (!options.getIncludedTests().isEmpty()
             || !options.getIncludedTestsCommandLine().isEmpty()
             || !options.getExcludedTests().isEmpty()) {
@@ -92,9 +86,12 @@ public class JUnitTestClassExecutor implements Action<String> {
             // For test suites (including suite-like custom Runners), if the test suite class
             // matches the filter, run the entire suite instead of filtering away its contents.
             if (!runner.getDescription().isSuite() || !matcher.matchesTest(testClassName, null)) {
-                filters.add(new MethodNameFilter(matcher));
+                testFilter = new MethodNameFilter(matcher);
             }
         }
+
+        IncludedMethodNameCollectingFilter collectingFilter = new IncludedMethodNameCollectingFilter(testFilter);
+        filters.add(collectingFilter);
 
         if (runner instanceof Filterable) {
             Filterable filterable = (Filterable) runner;
@@ -110,21 +107,17 @@ public class JUnitTestClassExecutor implements Action<String> {
             return;
         }
 
-        RunNotifier notifier = new RunNotifier();
-
-        if (true) {
+        if (options.isDryRun()) {
             try {
-                listener.testSuiteStarted(Description.createSuiteDescription("1"));
-                listener.testRunStarted(Description.createSuiteDescription("2"));
-                listener.testStarted(Description.createSuiteDescription("3"));
-                listener.testFinished(Description.createSuiteDescription("4"));
-                listener.testRunStarted(Description.createSuiteDescription("5"));
-                listener.testRunFinished(new Result());
-                listener.testSuiteFinished(Description.createSuiteDescription("7"));
+                for (Description includedTest : collectingFilter.includedTests) {
+                    listener.testStarted(includedTest);
+                    listener.testFinished(includedTest);
+                }
             } catch (Exception e) {
-                System.out.println(e);
+                throw new RuntimeException(e);
             }
         } else {
+            RunNotifier notifier = new RunNotifier();
             notifier.addListener(listener);
             runner.run(notifier);
         }
@@ -199,6 +192,43 @@ public class JUnitTestClassExecutor implements Action<String> {
         @Override
         public String describe() {
             return "Includes matching test methods";
+        }
+    }
+
+    private static class IncludedMethodNameCollectingFilter extends org.junit.runner.manipulation.Filter {
+
+        private final Filter delegate;
+        private final List<Description> includedTests = new ArrayList<Description>();
+
+        IncludedMethodNameCollectingFilter(org.junit.runner.manipulation.Filter delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public boolean shouldRun(Description description) {
+            boolean result = delegate.shouldRun(description);
+            if (result) {
+                includedTests.add(description);
+            }
+            return result;
+        }
+
+        @Override
+        public String describe() {
+            return "Collects included tests";
+        }
+    }
+
+    private static class MatchesAllFilter extends org.junit.runner.manipulation.Filter {
+
+        @Override
+        public boolean shouldRun(Description description) {
+            return true;
+        }
+
+        @Override
+        public String describe() {
+            return "Matches all";
         }
     }
 }

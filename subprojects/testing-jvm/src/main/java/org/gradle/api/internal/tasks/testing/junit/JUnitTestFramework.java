@@ -43,12 +43,9 @@ public class JUnitTestFramework implements TestFramework {
     private final DefaultTestFilter filter;
     private final boolean useImplementationDependencies;
 
-    private final boolean isDryRun;
-
     public JUnitTestFramework(Test testTask, DefaultTestFilter filter, boolean useImplementationDependencies) {
         this.filter = filter;
         this.useImplementationDependencies = useImplementationDependencies;
-        this.isDryRun = testTask.isDryRun();
         options = new JUnitOptions();
         detector = new JUnitDetector(new ClassFileExtractionManager(testTask.getTemporaryDirFactory()));
     }
@@ -58,8 +55,7 @@ public class JUnitTestFramework implements TestFramework {
         return new TestClassProcessorFactoryImpl(new JUnitSpec(
             options.getIncludeCategories(), options.getExcludeCategories(),
             filter.getIncludePatterns(), filter.getExcludePatterns(),
-            filter.getCommandLineIncludePatterns()),
-            isDryRun);
+            filter.getCommandLineIncludePatterns(), options.isDryRun()));
     }
 
     @Override
@@ -112,16 +108,14 @@ public class JUnitTestFramework implements TestFramework {
 
     private static class TestClassProcessorFactoryImpl implements WorkerTestClassProcessorFactory, Serializable {
         private final JUnitSpec spec;
-        private final boolean isDryRun;
 
-        public TestClassProcessorFactoryImpl(JUnitSpec spec, boolean isDryRun) {
-            this.isDryRun = isDryRun;
+        public TestClassProcessorFactoryImpl(JUnitSpec spec) {
             this.spec = spec;
         }
 
         @Override
         public TestClassProcessor create(ServiceRegistry serviceRegistry) {
-            return new JUnitTestClassProcessor(spec, serviceRegistry.get(IdGenerator.class), serviceRegistry.get(ActorFactory.class), serviceRegistry.get(Clock.class), isDryRun);
+            return new JUnitTestClassProcessor(spec, serviceRegistry.get(IdGenerator.class), serviceRegistry.get(ActorFactory.class), serviceRegistry.get(Clock.class));
         }
     }
 }

@@ -31,6 +31,9 @@ public class JUnitOptions extends TestFrameworkOptions {
 
     private Set<String> excludeCategories = new LinkedHashSet<String>();
 
+    // TODO this should probably be a Property<Boolean>
+    private boolean dryRun = false;
+
     public JUnitOptions includeCategories(String... includeCategories) {
         this.includeCategories.addAll(Arrays.asList(includeCategories));
         return this;
@@ -71,5 +74,12 @@ public class JUnitOptions extends TestFrameworkOptions {
         this.excludeCategories = excludeCategories;
     }
 
+    @Input
+    public boolean isDryRun() {
+        return dryRun;
+    }
 
+    public void setDryRun(boolean dryRun) {
+        this.dryRun = dryRun;
+    }
 }
