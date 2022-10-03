@@ -132,7 +132,7 @@ public class DefaultTestExecuter implements TestExecuter<JvmTestExecutionSpec> {
             detector = new DefaultTestClassScanner(testClassFiles, null, processor);
         }
 
-        new TestMainAction(detector, processor, testResultProcessor, workerLeaseService, clock, testExecutionSpec.getPath(), "Gradle Test Run " + testExecutionSpec.getIdentityPath(), testExecutionSpec.isDryRun()).run();
+        new TestMainAction(detector, processor, testResultProcessor, workerLeaseService, clock, testExecutionSpec.getPath(), "Gradle Test Run " + testExecutionSpec.getIdentityPath()).run();
     }
 
     @Override

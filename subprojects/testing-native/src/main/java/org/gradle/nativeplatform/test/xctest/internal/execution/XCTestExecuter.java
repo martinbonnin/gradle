@@ -94,7 +94,7 @@ public class XCTestExecuter implements TestExecuter<XCTestTestExecutionSpec> {
 
         Runnable detector = new XCTestDetector(processor, testExecutionSpec.getTestSelection());
 
-        new TestMainAction(detector, processor, testResultProcessor, getWorkerLeaseService(), getTimeProvider(), rootTestSuiteId, "Gradle Test Run " + testExecutionSpec.getPath(), testExecutionSpec.isDryRun()).run();
+        new TestMainAction(detector, processor, testResultProcessor, getWorkerLeaseService(), getTimeProvider(), rootTestSuiteId, "Gradle Test Run " + testExecutionSpec.getPath()).run();
     }
 
     @Override

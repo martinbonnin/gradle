@@ -277,11 +277,6 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
         return this;
     }
 
-    @Internal
-    public boolean isDryRun() {
-        return isDryRun;
-    }
-
     /**
      * Returns the version of Java used to run the tests based on the {@link JavaLauncher} specified by {@link #getJavaLauncher()},
      * or the executable specified by {@link #getExecutable()} if the {@code JavaLauncher} is not present.
@@ -660,7 +655,7 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
         boolean testIsModule = javaModuleDetector.isModule(modularity.getInferModulePath().get(), getTestClassesDirs());
         FileCollection classpath = javaModuleDetector.inferClasspath(testIsModule, stableClasspath);
         FileCollection modulePath = javaModuleDetector.inferModulePath(testIsModule, stableClasspath);
-        return new JvmTestExecutionSpec(getTestFramework(), classpath, modulePath, getCandidateClassFiles(), isScanForTestClasses(), getTestClassesDirs(), getPath(), getIdentityPath(), getForkEvery(), javaForkOptions, getMaxParallelForks(), getPreviousFailedTestClasses(), isDryRun);
+        return new JvmTestExecutionSpec(getTestFramework(), classpath, modulePath, getCandidateClassFiles(), isScanForTestClasses(), getTestClassesDirs(), getPath(), getIdentityPath(), getForkEvery(), javaForkOptions, getMaxParallelForks(), getPreviousFailedTestClasses());
     }
 
     private void validateToolchainConfiguration() {

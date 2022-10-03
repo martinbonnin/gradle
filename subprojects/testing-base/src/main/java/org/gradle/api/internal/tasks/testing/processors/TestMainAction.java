@@ -35,9 +35,7 @@ public class TestMainAction implements Runnable {
     private final Object rootTestSuiteId;
     private final String displayName;
 
-    private final boolean isDryRun;
-
-    public TestMainAction(Runnable detector, TestClassProcessor processor, TestResultProcessor resultProcessor, WorkerLeaseService workerLeaseService, Clock clock, Object rootTestSuiteId, String displayName, boolean isDryRun) {
+    public TestMainAction(Runnable detector, TestClassProcessor processor, TestResultProcessor resultProcessor, WorkerLeaseService workerLeaseService, Clock clock, Object rootTestSuiteId, String displayName) {
         this.detector = detector;
         this.processor = processor;
         this.resultProcessor = new AttachParentTestResultProcessor(resultProcessor);
@@ -45,7 +43,6 @@ public class TestMainAction implements Runnable {
         this.clock = clock;
         this.rootTestSuiteId = rootTestSuiteId;
         this.displayName = displayName;
-        this.isDryRun = isDryRun;
     }
 
     @Override
