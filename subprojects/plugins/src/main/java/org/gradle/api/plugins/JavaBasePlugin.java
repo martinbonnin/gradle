@@ -22,7 +22,6 @@ import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
@@ -339,7 +338,6 @@ public class JavaBasePlugin implements Plugin<Project> {
     }
 
     private void configureTest(final Project project, final JavaPluginExtension javaPluginExtension) {
-        project.getTasks().withType(Test.class, test -> project.getTasks().register(test.getName() + "Insights", task -> task.doLast(task1 -> System.out.println("Foo Bar"))));
         project.getTasks().withType(Test.class).configureEach(test -> configureTestDefaults(test, project, javaPluginExtension));
     }
 

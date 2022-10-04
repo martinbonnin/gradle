@@ -181,7 +181,7 @@ public abstract class DefaultJvmTestSuite implements JvmTestSuite {
         this.targets.withType(JvmTestSuiteTarget.class).configureEach(target -> {
             target.getTestTask().configure(task -> {
                 task.getTestFrameworkProperty().convention(getVersionedTestingFramework().map(vtf -> {
-                    switch (vtf.getFramework()) {
+                    switch(vtf.getFramework()) {
                         case JUNIT4:
                             return frameworkLookup.computeIfAbsent(vtf.getFramework(), f -> new JUnitTestFramework(task, (DefaultTestFilter) task.getFilter(), false));
                         case KOTLIN_TEST: // fall-through
@@ -203,7 +203,7 @@ public abstract class DefaultJvmTestSuite implements JvmTestSuite {
 
     private List<ExternalModuleDependency> createDependencies(List<ModuleVersionIdentifier> dependencies) {
         return dependencies.stream().map(id -> {
-            String notation = id.getGroup() + ":" + id.getName() + ("".equals(id.getVersion()) ? "" : (":" + id.getVersion()));
+            String notation = id.getGroup() + ":" + id.getName() + ("".equals(id.getVersion()) ?  "" : (":" + id.getVersion()));
             return dependencyFactory.create(notation);
         }).collect(Collectors.toList());
     }

@@ -208,7 +208,7 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         return factory.createAdapter(listener);
     }
 
-    private class SelectedTestsFilter implements IMethodInterceptor {
+    private static class SelectedTestsFilter implements IMethodInterceptor {
 
         private final TestSelectionMatcher matcher;
 

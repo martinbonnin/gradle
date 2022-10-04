@@ -29,7 +29,7 @@ class TestMainActionTest extends Specification {
     private final Clock timeProvider = Mock()
     private final WorkerLeaseRegistry.WorkerLease lease = Mock()
     private final WorkerLeaseService workerLeaseService = Mock()
-    private final TestMainAction action = new TestMainAction(detector, processor, resultProcessor, workerLeaseService, timeProvider, "rootTestSuiteId456", "Test Run", isDryRun)
+    private final TestMainAction action = new TestMainAction(detector, processor, resultProcessor, workerLeaseService, timeProvider, "rootTestSuiteId456", "Test Run")
 
     def 'fires start and end events around detector execution'() {
         when:
