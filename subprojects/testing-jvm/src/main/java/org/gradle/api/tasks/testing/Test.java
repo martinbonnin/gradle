@@ -176,8 +176,6 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
     private final Property<TestFramework> testFramework;
     private boolean userHasConfiguredTestFramework;
     private boolean optionsAccessed;
-
-    private boolean isDryRun = false;
     private boolean scanForTestClasses = true;
     private long forkEvery;
     private int maxParallelForks = 1;
@@ -268,12 +266,6 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
     @Override
     public Test workingDir(Object dir) {
         forkOptions.workingDir(dir);
-        return this;
-    }
-
-    @Option(option = "dry-run-tests", description = "Sets test class or method name to be included, '*' is supported.")
-    public AbstractTestTask setDryRun(boolean isDryRun) {
-        this.isDryRun = isDryRun;
         return this;
     }
 
