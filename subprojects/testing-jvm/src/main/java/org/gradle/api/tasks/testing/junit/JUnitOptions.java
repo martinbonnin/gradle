@@ -31,6 +31,8 @@ public class JUnitOptions extends TestFrameworkOptions {
 
     private Set<String> excludeCategories = new LinkedHashSet<String>();
 
+    private boolean dryRun = false;
+
     /**
      * Copies the options from the source options into the current one.
      * @since 8.0
@@ -44,9 +46,6 @@ public class JUnitOptions extends TestFrameworkOptions {
         target.clear();
         target.addAll(source);
     }
-
-    // TODO this should probably be a Property<Boolean>
-    private boolean dryRun = false;
 
     public JUnitOptions includeCategories(String... includeCategories) {
         this.includeCategories.addAll(Arrays.asList(includeCategories));

@@ -110,10 +110,10 @@ public abstract class AbstractTestTask extends ConventionTask implements Verific
     private final ListenerBroadcast<TestListenerInternal> testListenerInternalBroadcaster;
     private final TestLoggingContainer testLogging;
     private final DirectoryProperty binaryResultsDirectory;
+    private final Property<Boolean> dryRun;
     private TestReporter testReporter;
     private boolean ignoreFailures;
     private boolean failFast;
-    private Property<Boolean> dryRun;
 
     public AbstractTestTask() {
         Instantiator instantiator = getInstantiator();
