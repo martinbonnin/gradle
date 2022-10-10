@@ -16,8 +16,20 @@
 
 package org.gradle.api.tasks.testing;
 
+import org.gradle.api.tasks.Input;
+
 /**
  * The base class for any test framework specific options.
  */
 public class TestFrameworkOptions {
+    private boolean dryRun = false;
+
+    @Input
+    public boolean isDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(boolean dryRun) {
+        this.dryRun = dryRun;
+    }
 }

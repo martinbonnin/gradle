@@ -18,56 +18,47 @@ package org.gradle.testing
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.DefaultTestExecutionResult
+import org.gradle.integtests.fixtures.TestExecutionResult
+import org.gradle.integtests.fixtures.TestNGExecutionResult
+import org.gradle.integtests.fixtures.executer.DefaultGradleDistribution
+import spock.lang.Shared
 
 class TestDryRunIntegrationTest extends AbstractIntegrationSpec {
 
-    def "dry run JUnit test is skipping execution"() {
+    def "dry run #type test is skipping execution and considering as passed in report"(String type, String testSetup, String failingTest) {
         given:
-        buildFile << """
-            $jUnitSetup
-        """
+        buildFile << testSetup
 
         and:
-        file("src/test/java/SomeTest.java") << """
-            import org.junit.*;
+        file("src/test/java/SomeTest.java") << failingTest
 
-            public class SomeTest {
-                @Test public void failingTest() {
-                    throw new RuntimeException();
-                }
-            }
-        """
+        and:
+        TestExecutionResult executionResult
+        switch (type) {
+            case "JUnit":
+            case "JUnitPlatform":
+                executionResult = new DefaultTestExecutionResult(testDirectory)
+                break
+            case "TestNG":
+                executionResult = new TestNGExecutionResult(testDirectory)
+                break
+            default:
+                throw new IllegalArgumentException()
+        }
 
         expect:
         succeeds("test", "--test-dry-run", "--info")
+        System.exit(0)
+        executionResult.testClass("SomeTest").assertTestPassed("failingTest")
+
+        where:
+        type            | testSetup          | failingTest
+        "JUnit"         | jUnitSetup         | failingJUnitTest
+        "JUnitPlatform" | jUnitPlatformSetup | failingJUnitPlatformTest
+//        "TestNG"        | testNgSetup        | failingTestNGTest
     }
 
-    def "dry run JUnit test is considering as passed in reports"() {
-        given:
-        buildFile << """
-            $jUnitSetup
-        """
-
-        and:
-        file("src/test/java/SomeTest.java") << """
-            import org.junit.*;
-
-            public class SomeTest {
-                @Test public void failingTest() {
-                    throw new RuntimeException();
-                }
-            }
-        """
-
-        when:
-        succeeds("test", "--test-dry-run")
-
-        then:
-        def result = new DefaultTestExecutionResult(testDirectory)
-        result.testClassByHtml("SomeTest").assertTestPassed("failingTest")
-        result.testClassByXml("SomeTest").assertTestPassed("failingTest")
-    }
-
+    @Shared
     private String jUnitSetup = """
         apply plugin: 'java-library'
         ${mavenCentralRepository()}
@@ -76,5 +67,64 @@ class TestDryRunIntegrationTest extends AbstractIntegrationSpec {
             useJUnit()
         }
         dependencies { testImplementation 'junit:junit:4.13' }
+        """
+
+    @Shared
+    private String testNgSetup = """
+        apply plugin: 'java-library'
+        ${mavenCentralRepository()}
+
+        test {
+            useTestNG()
+        }
+        dependencies { testImplementation 'org.testng:testng:6.9.10' }
+        """
+
+    @Shared
+    private String jUnitPlatformSetup = """
+        apply plugin: 'java-library'
+        ${mavenCentralRepository()}
+
+        test {
+            useJUnitPlatform()
+        }
+
+        dependencies {
+            testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+            testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+        }
+        """
+
+    @Shared
+    private String failingJUnitPlatformTest = """
+        import org.junit.jupiter.api.*;
+
+        public class SomeTest {
+            @Test public void failingTest() {
+                throw new RuntimeException();
+            }
+        }
+        """
+
+    @Shared
+    private String failingTestNGTest = """
+        import org.testng.annotations.*;
+
+        public class SomeTest {
+            @Test public void failingTest() {
+                throw new RuntimeException();
+            }
+        }
+        """
+
+    @Shared
+    private String failingJUnitTest = """
+        import org.junit.*;
+
+        public class SomeTest {
+            @Test public void failingTest() {
+                throw new RuntimeException();
+            }
+        }
         """
 }

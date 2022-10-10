@@ -37,6 +37,7 @@ public class TestNGSpec implements Serializable {
     private final Set<String> excludedTests;
     private final Set<String> includedTestsCommandLine;
     private final String configFailurePolicy;
+    private final boolean isDryRun;
     private final boolean preserveOrder;
     private final boolean groupByInstances;
 
@@ -55,6 +56,7 @@ public class TestNGSpec implements Serializable {
         this.configFailurePolicy = options.getConfigFailurePolicy();
         this.preserveOrder = options.getPreserveOrder();
         this.groupByInstances = options.getGroupByInstances();
+        this.isDryRun = options.isDryRun();
     }
 
     public Set<String> getListeners() {
@@ -111,5 +113,9 @@ public class TestNGSpec implements Serializable {
 
     public boolean getGroupByInstances() {
         return groupByInstances;
+    }
+
+    public boolean isDryRun() {
+        return isDryRun;
     }
 }

@@ -27,7 +27,7 @@ public class JUnitPlatformSpec extends AbstractJUnitSpec {
     private final Set<String> excludeEngines;
     private final Set<String> includeTags;
     private final Set<String> excludeTags;
-
+    private final boolean isDryRun;
     public JUnitPlatformSpec(JUnitPlatformOptions options, Set<String> includedTests,
                              Set<String> excludedTests, Set<String> includedTestsCommandLine) {
         super(includedTests, excludedTests, includedTestsCommandLine);
@@ -35,6 +35,7 @@ public class JUnitPlatformSpec extends AbstractJUnitSpec {
         this.excludeEngines = options.getExcludeEngines();
         this.includeTags = options.getIncludeTags();
         this.excludeTags = options.getExcludeTags();
+        this.isDryRun = options.isDryRun();
     }
 
     public List<String> getIncludeEngines() {
@@ -51,5 +52,9 @@ public class JUnitPlatformSpec extends AbstractJUnitSpec {
 
     public List<String> getExcludeTags() {
         return new ArrayList<String>(excludeTags);
+    }
+
+    public boolean isDryRun() {
+        return isDryRun;
     }
 }

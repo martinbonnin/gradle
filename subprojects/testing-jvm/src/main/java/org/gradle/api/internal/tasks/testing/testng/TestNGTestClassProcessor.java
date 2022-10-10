@@ -35,13 +35,18 @@ import org.testng.IMethodInterceptor;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
+import org.testng.ITestResult;
 import org.testng.TestNG;
+import org.testng.TestRunner;
+import org.testng.internal.TestResult;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.gradle.api.tasks.testing.testng.TestNGOptions.DEFAULT_CONFIG_FAILURE_POLICY;
@@ -132,18 +137,38 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
             }
         }
 
+        CountingFilter filter = new AllMatchFilter();
         if (!options.getIncludedTests().isEmpty() || !options.getIncludedTestsCommandLine().isEmpty() || !options.getExcludedTests().isEmpty()) {
-            testNg.addListener(new SelectedTestsFilter(options.getIncludedTests(),
-                options.getExcludedTests(), options.getIncludedTestsCommandLine()));
+            filter = new SelectedTestsFilter(options.getIncludedTests(),
+                options.getExcludedTests(), options.getIncludedTestsCommandLine());
         }
+        testNg.addListener(filter);
 
         if (!suiteFiles.isEmpty()) {
             testNg.setTestSuites(GFileUtils.toPaths(suiteFiles));
         } else {
             testNg.setTestClasses(testClasses.toArray(new Class<?>[0]));
         }
-        testNg.addListener((Object) adaptListener(new TestNGTestResultProcessorAdapter(resultProcessor, idGenerator, clock)));
-        testNg.run();
+
+        ITestListener listener = new TestNGTestResultProcessorAdapter(resultProcessor, idGenerator, clock);
+
+        if (options.isDryRun()) {
+            for (IMethodInstance a : filter.filtered) {
+                ITestResult result = new TestResult(
+                    a.getMethod().getTestClass(),
+                    a.getInstance(),
+                    a.getMethod(),
+                    null,
+                    0,
+                    1
+                );
+                listener.onTestStart(result);
+                listener.onTestSuccess(result);
+            }
+        } else {
+            testNg.addListener((Object) adaptListener(listener));
+            testNg.run();
+        }
     }
 
     /**
@@ -208,25 +233,45 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         return factory.createAdapter(listener);
     }
 
-    private static class SelectedTestsFilter implements IMethodInterceptor {
+    private static abstract class CountingFilter implements IMethodInterceptor {
+
+        public final List<IMethodInstance> filtered = new LinkedList<IMethodInstance>();
+    }
+
+    private static class AllMatchFilter extends CountingFilter {
+
+        @Override
+        public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
+            filtered.clear();
+            filtered.addAll(methods);
+            return methods;
+        }
+    }
+
+    private static class SelectedTestsFilter extends CountingFilter {
 
         private final TestSelectionMatcher matcher;
 
-        public SelectedTestsFilter(Set<String> includedTests, Set<String> excludedTests,
-            Set<String> includedTestsCommandLine) {
+        public SelectedTestsFilter(
+            Set<String> includedTests, Set<String> excludedTests,
+            Set<String> includedTestsCommandLine
+        ) {
             matcher = new TestSelectionMatcher(includedTests, excludedTests, includedTestsCommandLine);
         }
 
         @Override
         public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
             ISuite suite = context.getSuite();
-            List<IMethodInstance> filtered = new LinkedList<IMethodInstance>();
+//            List<IMethodInstance> filtered = new LinkedList<IMethodInstance>();
+            filtered.clear();
             for (IMethodInstance candidate : methods) {
                 if (matcher.matchesTest(candidate.getMethod().getTestClass().getName(), candidate.getMethod().getMethodName())
                     || matcher.matchesTest(suite.getName(), null)) {
                     filtered.add(candidate);
                 }
             }
+
+
             return filtered;
         }
     }

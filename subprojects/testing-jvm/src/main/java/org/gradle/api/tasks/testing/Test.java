@@ -679,9 +679,7 @@ public class Test extends AbstractTestTask implements JavaForkOptions, PatternFi
     public void executeTests() {
         if (getDryRun().get()) {
             TestFrameworkOptions options = getOptions();
-            if (options instanceof JUnitOptions) {
-                ((JUnitOptions) options).setDryRun(true);
-            }
+            options.setDryRun(true);
         }
 
         JavaVersion javaVersion = getJavaVersion();

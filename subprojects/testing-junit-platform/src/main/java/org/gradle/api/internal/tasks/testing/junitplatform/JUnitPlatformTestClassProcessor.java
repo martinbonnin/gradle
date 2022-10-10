@@ -28,6 +28,7 @@ import org.gradle.internal.time.Clock;
 import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.FilterResult;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -35,12 +36,17 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.PostDiscoveryFilter;
+import org.junit.platform.launcher.TestExecutionListener;
+import org.junit.platform.launcher.TestIdentifier;
+import org.junit.platform.launcher.TestPlan;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -95,9 +101,40 @@ public class JUnitPlatformTestClassProcessor extends AbstractJUnitTestClassProce
 
         private void processAllTestClasses() {
             Launcher launcher = LauncherFactory.create();
-            launcher.registerTestExecutionListeners(new JUnitPlatformTestExecutionListener(resultProcessor, clock, idGenerator));
-            launcher.execute(createLauncherDiscoveryRequest(testClasses));
+            TestExecutionListener listener = new JUnitPlatformTestExecutionListener(resultProcessor, clock, idGenerator);
+            LauncherDiscoveryRequest discoveryRequest = createLauncherDiscoveryRequest(testClasses);
+            launcher.registerTestExecutionListeners(listener);
+
+            if (spec.isDryRun()) {
+                TestPlan testPlan = launcher.discover(discoveryRequest);
+                executeDryRun(testPlan, listener);
+            } else {
+                launcher.execute(createLauncherDiscoveryRequest(testClasses));
+            }
         }
+    }
+
+    private void executeDryRun(TestPlan testPlan, TestExecutionListener listener) {
+        List<TestIdentifier> testIdentifiers = new LinkedList<>();
+
+        for (TestIdentifier root : testPlan.getRoots()) {
+            testIdentifiers.add(root);
+            testIdentifiers.addAll(testPlan.getDescendants(root));
+        }
+
+        listener.testPlanExecutionStarted(testPlan);
+
+        for (TestIdentifier identifier : testIdentifiers) {
+            listener.executionStarted(identifier);
+        }
+
+        Collections.reverse(testIdentifiers);
+
+        for (TestIdentifier identifier : testIdentifiers) {
+            listener.executionFinished(identifier, TestExecutionResult.successful());
+        }
+
+        listener.testPlanExecutionFinished(testPlan);
     }
 
     /**

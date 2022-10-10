@@ -31,8 +31,6 @@ public class JUnitOptions extends TestFrameworkOptions {
 
     private Set<String> excludeCategories = new LinkedHashSet<String>();
 
-    private boolean dryRun = false;
-
     /**
      * Copies the options from the source options into the current one.
      * @since 8.0
@@ -40,6 +38,7 @@ public class JUnitOptions extends TestFrameworkOptions {
     public void copyFrom(JUnitOptions other) {
         replace(this.includeCategories, other.includeCategories);
         replace(this.excludeCategories, other.excludeCategories);
+        //TODO
     }
 
     private static void replace(Set<String> target, Set<String> source) {
@@ -85,14 +84,5 @@ public class JUnitOptions extends TestFrameworkOptions {
      */
     public void setExcludeCategories(Set<String> excludeCategories) {
         this.excludeCategories = excludeCategories;
-    }
-
-    @Input
-    public boolean isDryRun() {
-        return dryRun;
-    }
-
-    public void setDryRun(boolean dryRun) {
-        this.dryRun = dryRun;
     }
 }
