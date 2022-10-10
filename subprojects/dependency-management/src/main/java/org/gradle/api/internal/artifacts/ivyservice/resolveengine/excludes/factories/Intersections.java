@@ -15,17 +15,7 @@
  */
 package org.gradle.api.internal.artifacts.ivyservice.resolveengine.excludes.factories;
 
-import com.google.common.collect.Sets;
-import org.gradle.api.artifacts.ModuleIdentifier;
-import org.gradle.api.internal.artifacts.ivyservice.resolveengine.excludes.specs.ExcludeAnyOf;
-import org.gradle.api.internal.artifacts.ivyservice.resolveengine.excludes.specs.ExcludeNothing;
 import org.gradle.api.internal.artifacts.ivyservice.resolveengine.excludes.specs.ExcludeSpec;
-import org.gradle.api.internal.artifacts.ivyservice.resolveengine.excludes.specs.GroupExclude;
-import org.gradle.api.internal.artifacts.ivyservice.resolveengine.excludes.specs.ModuleIdSetExclude;
-
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
 
 public class Intersections {
     private final ExcludeFactory factory;
@@ -44,88 +34,5 @@ public class Intersections {
         } else {
             return left.beginIntersect(right, factory);
         }
-    }
-
-    public static ExcludeSpec doIntersect(ExcludeAnyOf left, ExcludeSpec right, ExcludeFactory factory) {
-        Set<ExcludeSpec> leftComponents = left.getComponents();
-        // Here, we will distribute A ∩ (B ∪ C) if, and only if, at
-        // least one of the distribution operations (A ∩ B) can be simplified
-        ExcludeSpec[] excludeSpecs = leftComponents.toArray(new ExcludeSpec[0]);
-        ExcludeSpec[] intersections = null;
-        for (int i = 0; i < excludeSpecs.length; i++) {
-            ExcludeSpec excludeSpec = excludeSpecs[i].beginIntersect(right, factory);
-            if (excludeSpec != null) {
-                if (intersections == null) {
-                    intersections = new ExcludeSpec[excludeSpecs.length];
-                }
-                intersections[i] = excludeSpec;
-            }
-        }
-        if (intersections != null) {
-            Set<ExcludeSpec> simplified = Sets.newHashSetWithExpectedSize(excludeSpecs.length);
-            for (int i = 0; i < intersections.length; i++) {
-                ExcludeSpec intersection = intersections[i];
-                if (intersection instanceof ExcludeNothing) {
-                    continue;
-                }
-                if (intersection != null) {
-                    simplified.add(intersection);
-                } else {
-                    simplified.add(factory.allOf(excludeSpecs[i], right));
-                }
-            }
-            return factory.fromUnion(simplified);
-        } else {
-            return null;
-        }
-    }
-
-    public static ExcludeSpec doIntersect(ExcludeAnyOf left, ExcludeAnyOf right, ExcludeFactory factory) {
-        Set<ExcludeSpec> leftComponents = left.getComponents();
-        Set<ExcludeSpec> rightComponents = right.getComponents();
-        Set<ExcludeSpec> common = Sets.newHashSet(leftComponents);
-        common.retainAll(rightComponents);
-        if (common.size() >= 1) {
-            ExcludeSpec alpha = factory.fromUnion(common);
-            if (leftComponents.equals(common) || rightComponents.equals(common)) {
-                return alpha;
-            }
-            Set<ExcludeSpec> remainderLeft = Sets.newHashSet(leftComponents);
-            remainderLeft.removeAll(common);
-            Set<ExcludeSpec> remainderRight = Sets.newHashSet(rightComponents);
-            remainderRight.removeAll(common);
-
-            ExcludeSpec unionLeft = factory.fromUnion(remainderLeft);
-            ExcludeSpec unionRight = factory.fromUnion(remainderRight);
-            ExcludeSpec beta = factory.allOf(unionLeft, unionRight);
-            return factory.anyOf(alpha, beta);
-        } else {
-            // slowest path, full distribution
-            // (A ∪ B) ∩ (C ∪ D) = (A ∩ C) ∪ (A ∩ D) ∪ (B ∩ C) ∪ (B ∩ D)
-            Set<ExcludeSpec> intersections = Sets.newHashSetWithExpectedSize(leftComponents.size() * rightComponents.size());
-            for (ExcludeSpec leftSpec : leftComponents) {
-                for (ExcludeSpec rightSpec : rightComponents) {
-                    ExcludeSpec merged = leftSpec.beginIntersect(rightSpec, factory);
-                    //ExcludeSpec merged = leftSpec.beginIntersect(rightSpec, factory);
-                    if (merged == null) {
-                        merged = factory.allOf(leftSpec, rightSpec);
-                    }
-                    if (!(merged instanceof ExcludeNothing)) {
-                        intersections.add(merged);
-                    }
-                }
-            }
-            return factory.fromUnion(intersections);
-        }
-    }
-
-
-
-
-
-    public static ExcludeSpec doIntersect(GroupExclude left, ModuleIdSetExclude right, ExcludeFactory factory) {
-        String group = left.getGroup();
-        Set<ModuleIdentifier> moduleIds = right.getModuleIds().stream().filter(id -> id.getGroup().equals(group)).collect(toSet());
-        return factory.fromModuleIds(moduleIds);
     }
 }
