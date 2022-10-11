@@ -16,6 +16,7 @@
 
 package org.gradle.api.internal.artifacts.ivyservice.resolveengine.excludes.factories
 
+
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -120,4 +121,6 @@ class IntersectionsTest extends Specification implements ExcludeTestSupport {
         anyOf(ivy("org", "mod", artifact("mod"), "exact"), ivy("org", "mod2", artifact("mod"), "exact"), group("bar")) | group("org")                                                                           | anyOf(allOf(ivy("org", "mod", artifact("mod"), "exact"), group("org")), allOf(ivy("org", "mod2", artifact("mod"), "exact"), group("org")))
 
     }
+
+
 }
