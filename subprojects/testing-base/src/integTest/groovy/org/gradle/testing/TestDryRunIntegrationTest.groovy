@@ -47,15 +47,15 @@ class TestDryRunIntegrationTest extends AbstractIntegrationSpec {
         }
 
         expect:
-        succeeds("test", "--test-dry-run", "--info")
-        System.exit(0)
+        succeeds("test", "--test-dry-run", "--info", "--debug-jvm")
+//        System.exit(0)
         executionResult.testClass("SomeTest").assertTestPassed("failingTest")
 
         where:
         type            | testSetup          | failingTest
-        "JUnit"         | jUnitSetup         | failingJUnitTest
-        "JUnitPlatform" | jUnitPlatformSetup | failingJUnitPlatformTest
-//        "TestNG"        | testNgSetup        | failingTestNGTest
+//        "JUnit"         | jUnitSetup         | failingJUnitTest
+//        "JUnitPlatform" | jUnitPlatformSetup | failingJUnitPlatformTest
+        "TestNG"        | testNgSetup        | failingTestNGTest
     }
 
     @Shared
