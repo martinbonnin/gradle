@@ -161,8 +161,6 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         ITestListener listener = new TestNGTestResultProcessorAdapter(resultProcessor, idGenerator, clock);
 
         if (options.isDryRun()) {
-            TestDryRunnerFactory factory = new TestDryRunnerFactory();
-            testNg.setTestRunnerFactory1(factory);
             invokeVerifiedVoidMethod(testNg, "initializeCommandLineSuites");
             invokeVerifiedVoidMethod(testNg, "initializeCommandLineSuitesGroups");
             invokeVerifiedVoidMethod(testNg, "sanityCheck");
@@ -173,32 +171,27 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
                 invokeVerifiedMethod(testNg, "createSuiteRunners", new Class[]{SuiteRunnerMap.class, XmlSuite.class}, new Object[]{suiteRunnerMap, xmlSuite});
             }
 
-            List<IMethodInstance> filteredTestMethods = Lists.newArrayList();
-            List<IInvokedMethodListener> testRunnerEmptyListeners = new ArrayList<IInvokedMethodListener>();
             for (ISuite suite : suiteRunnerMap.values()) {
-//                ITestRunnerFactory testRunnerFactory = JavaMethod.of(SuiteRunner.class, ITestRunnerFactory.class, "buildRunnerFactory").invoke((SuiteRunner) suite);
-                List<XmlTest> xmlTests = suite.getXmlSuite().getTests();
+                ITestContext testDryRunner = new TestDryRunner(suite);
+                List<IMethodInstance> testMethods = Lists.newArrayList();
 
-//                List<TestRunner> testRunners = new ArrayList<TestRunner>();
-
-//                for (XmlTest xmlTest : xmlTests) {
-//                    testRunners.add(testRunnerFactory.newTestRunner(suite, xmlTest, testRunnerEmptyListeners));
-//                }
-
-                for (TestRunner testRunner : factory.runners) {
-                    List<IMethodInstance> testMethods = Lists.newArrayList();
-                    for (ITestNGMethod testNGMethod : testRunner.getAllTestMethods()) {
-                        testMethods.add(new MethodInstance(testNGMethod));
-                    }
-
-                    filteredTestMethods.addAll(filter.intercept(testMethods, testRunner));
+                for (ITestNGMethod testNGMethod : suite.getAllMethods()) {
+                    testMethods.add(new MethodInstance(testNGMethod));
                 }
-            }
 
-            for (IMethodInstance a : filteredTestMethods) {
-                ITestResult result = new TestResult(a.getMethod().getTestClass(), a.getInstance(), a.getMethod(), null, 0, 0);
-                listener.onTestStart(result);
-                listener.onTestSuccess(result);
+                List<IMethodInstance> filteredTestMethods = filter.intercept(testMethods, testDryRunner);
+
+                listener.onStart(testDryRunner);
+                for (IMethodInstance a : filteredTestMethods) {
+                    TestResult result = new TestResult();
+                    result.setTestClass(a.getMethod().getTestClass());
+                    result.setMethod(a.getMethod());
+                    result.setStatus(ITestResult.SUCCESS);
+
+                    listener.onTestStart(result);
+                    listener.onTestSuccess(result);
+                }
+                listener.onFinish(testDryRunner);
             }
         } else {
             testNg.addListener((Object) adaptListener(listener));
@@ -290,10 +283,6 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         public List<XmlSuite> getXmlSuites() {
             return m_suites;
         }
-
-        public void setTestRunnerFactory1(ITestRunnerFactory testRunnerFactory) {
-            setTestRunnerFactory(testRunnerFactory);
-        }
     }
 
     private static class AllMatchFilter implements IMethodInterceptor {
@@ -331,7 +320,7 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         }
     }
 
-     private static class TestDryRunnerFactory implements ITestRunnerFactory {
+    private static class TestDryRunnerFactory implements ITestRunnerFactory {
 
         public final List<TestRunner> runners = new ArrayList<TestRunner>();
 
