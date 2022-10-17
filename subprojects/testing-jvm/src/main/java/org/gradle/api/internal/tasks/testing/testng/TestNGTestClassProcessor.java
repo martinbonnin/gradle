@@ -54,6 +54,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 import static org.gradle.api.tasks.testing.testng.TestNGOptions.DEFAULT_CONFIG_FAILURE_POLICY;
@@ -161,6 +162,7 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         ITestListener listener = new TestNGTestResultProcessorAdapter(resultProcessor, idGenerator, clock);
 
         if (options.isDryRun()) {
+            testNg.initializeSuitesAndJarFile();
             invokeVerifiedVoidMethod(testNg, "initializeCommandLineSuites");
             invokeVerifiedVoidMethod(testNg, "initializeCommandLineSuitesGroups");
             invokeVerifiedVoidMethod(testNg, "sanityCheck");
@@ -172,26 +174,32 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
             }
 
             for (ISuite suite : suiteRunnerMap.values()) {
-                ITestContext testDryRunner = new TestDryRunner(suite);
-                List<IMethodInstance> testMethods = Lists.newArrayList();
 
-                for (ITestNGMethod testNGMethod : suite.getAllMethods()) {
-                    testMethods.add(new MethodInstance(testNGMethod));
+                for (XmlTest xmlTest : suite.getXmlSuite().getTests()) {
+                    TestRunner testRunner = new TestRunner(new Configuration(), suite, xmlTest, false, new ArrayList<IInvokedMethodListener>());
+
+                    List<IMethodInstance> allTestMethods = Lists.newArrayList();
+
+                    for (ITestNGMethod testNGMethod : testRunner.getAllTestMethods()) {
+                        allTestMethods.add(new MethodInstance(testNGMethod));
+                    }
+
+                    List<IMethodInstance> filteredTestMethods = filter.intercept(allTestMethods, testRunner);
+
+                    listener.onStart(testRunner);
+
+                    for (IMethodInstance a : filteredTestMethods) {
+                        TestResult result = new TestResult();
+                        result.setTestClass(a.getMethod().getTestClass());
+                        result.setMethod(a.getMethod());
+                        result.setStatus(ITestResult.SUCCESS);
+
+                        listener.onTestStart(result);
+                        listener.onTestSuccess(result);
+                    }
+
+                    listener.onFinish(testRunner);
                 }
-
-                List<IMethodInstance> filteredTestMethods = filter.intercept(testMethods, testDryRunner);
-
-                listener.onStart(testDryRunner);
-                for (IMethodInstance a : filteredTestMethods) {
-                    TestResult result = new TestResult();
-                    result.setTestClass(a.getMethod().getTestClass());
-                    result.setMethod(a.getMethod());
-                    result.setStatus(ITestResult.SUCCESS);
-
-                    listener.onTestStart(result);
-                    listener.onTestSuccess(result);
-                }
-                listener.onFinish(testDryRunner);
             }
         } else {
             testNg.addListener((Object) adaptListener(listener));
@@ -317,18 +325,6 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
 
 
             return filtered;
-        }
-    }
-
-    private static class TestDryRunnerFactory implements ITestRunnerFactory {
-
-        public final List<TestRunner> runners = new ArrayList<TestRunner>();
-
-        @Override
-        public TestRunner newTestRunner(ISuite suite, XmlTest test, List<IInvokedMethodListener> listeners) {
-            TestRunner runner = new TestRunner(new Configuration(), suite, test, false, listeners);
-            runners.add(runner);
-            return runner;
         }
     }
 }

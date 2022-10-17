@@ -16,24 +16,38 @@
 
 package org.gradle.api.internal.tasks.testing.testng;
 
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import org.testng.IAttributes;
 import org.testng.IResultMap;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.ITestNGMethod;
+import org.testng.collections.ListMultiMap;
+import org.testng.collections.Maps;
+import org.testng.internal.Attributes;
 import org.testng.internal.ResultMap;
 import org.testng.xml.XmlTest;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class TestDryRunner implements ITestContext {
 
     private final ISuite suite;
 
-    public TestDryRunner(ISuite suite) {
+    private final IAttributes attributes = new Attributes();
+
+    private final ListMultiMap<Class<? extends Module>, Module> guiceModules = Maps.newListMultiMap();
+
+    private final XmlTest xmlTest;
+
+    public TestDryRunner(ISuite suite, XmlTest xmlTest) {
         this.suite = suite;
+        this.xmlTest = xmlTest;
     }
 
     @Override
@@ -123,46 +137,48 @@ public class TestDryRunner implements ITestContext {
 
     @Override
     public XmlTest getCurrentXmlTest() {
-        return null;
+        return xmlTest;
     }
+
+    private final Map<List<Module>, Injector> injectors = Maps.newHashMap();
 
     @Override
     public void addInjector(List<com.google.inject.Module> moduleInstances, com.google.inject.Injector injector) {
-
+        injectors.put(moduleInstances, injector);
     }
 
     @Override
     public com.google.inject.Injector getInjector(List<com.google.inject.Module> moduleInstances) {
-        return null;
+        return injectors.get(moduleInstances);
     }
 
     @Override
     public void addGuiceModule(Class<? extends com.google.inject.Module> cls, com.google.inject.Module module) {
-
+        guiceModules.put(cls, module);
     }
 
     @Override
     public List<com.google.inject.Module> getGuiceModules(Class<? extends com.google.inject.Module> cls) {
-        return null;
+        return guiceModules.get(cls);
     }
 
     @Override
     public Object getAttribute(String name) {
-        return null;
+        return attributes.getAttribute(name);
     }
 
     @Override
     public void setAttribute(String name, Object value) {
-
+        attributes.setAttribute(name, value);
     }
 
     @Override
     public Set<String> getAttributeNames() {
-        return null;
+        return attributes.getAttributeNames();
     }
 
     @Override
     public Object removeAttribute(String name) {
-        return null;
+        return attributes.removeAttribute(name);
     }
 }
