@@ -117,8 +117,7 @@ public class DefaultTestExecuter implements TestExecuter<JvmTestExecutionSpec> {
         processor =
             new PatternMatchTestClassProcessor(testFilter,
                 new RunPreviousFailedFirstTestClassProcessor(testExecutionSpec.getPreviousFailedTestClasses(),
-                    new MaxNParallelTestClassProcessor(getMaxParallelForks(testExecutionSpec), reforkingProcessorFactory, actorFactory))
-                );
+                    new MaxNParallelTestClassProcessor(getMaxParallelForks(testExecutionSpec), reforkingProcessorFactory, actorFactory)));
 
         final FileTree testClassFiles = testExecutionSpec.getCandidateClassFiles();
 

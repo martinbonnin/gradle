@@ -139,7 +139,7 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
             }
         }
 
-        IMethodInterceptor filter = new AllMatchFilter();
+        IMethodInterceptor filter = new MatchesAllFilter();
         if (!options.getIncludedTests().isEmpty() || !options.getIncludedTestsCommandLine().isEmpty() || !options.getExcludedTests().isEmpty()) {
             filter = new SelectedTestsFilter(options.getIncludedTests(),
                 options.getExcludedTests(), options.getIncludedTestsCommandLine());
@@ -235,7 +235,7 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         }
     }
 
-    private static class AllMatchFilter implements IMethodInterceptor {
+    private static class MatchesAllFilter implements IMethodInterceptor {
 
         @Override
         public List<IMethodInstance> intercept(List<IMethodInstance> methods, ITestContext context) {
@@ -247,9 +247,8 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
 
         private final TestSelectionMatcher matcher;
 
-        public SelectedTestsFilter(
-            Set<String> includedTests, Set<String> excludedTests, Set<String> includedTestsCommandLine
-        ) {
+        public SelectedTestsFilter(Set<String> includedTests, Set<String> excludedTests,
+            Set<String> includedTestsCommandLine) {
             matcher = new TestSelectionMatcher(includedTests, excludedTests, includedTestsCommandLine);
         }
 
@@ -258,12 +257,11 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
             ISuite suite = context.getSuite();
             List<IMethodInstance> filtered = new LinkedList<IMethodInstance>();
             for (IMethodInstance candidate : methods) {
-                if (matcher.matchesTest(candidate.getMethod().getTestClass().getName(), candidate.getMethod().getMethodName()) || matcher.matchesTest(suite.getName(), null)) {
+                if (matcher.matchesTest(candidate.getMethod().getTestClass().getName(), candidate.getMethod().getMethodName())
+                    || matcher.matchesTest(suite.getName(), null)) {
                     filtered.add(candidate);
                 }
             }
-
-
             return filtered;
         }
     }
