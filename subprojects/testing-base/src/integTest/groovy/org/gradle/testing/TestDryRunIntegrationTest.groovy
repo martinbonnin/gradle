@@ -25,12 +25,12 @@ import spock.lang.Shared
 
 class TestDryRunIntegrationTest extends AbstractIntegrationSpec {
 
-    def "dry run #type test is skipping execution and considering as passed in report"(String type, String testSetup, String failingTest) {
+    def "dry run #type test is skipping execution and considering as passed in report"(String type, String testSetup, String test) {
         given:
         buildFile << testSetup
 
         and:
-        file("src/test/java/SomeTest.java") << failingTest
+        file("src/test/java/SomeTest.java") << test
         TestExecutionResult executionResult = new DefaultTestExecutionResult(testDirectory)
 
         expect:
@@ -38,7 +38,7 @@ class TestDryRunIntegrationTest extends AbstractIntegrationSpec {
         executionResult.testClass("SomeTest").assertTestPassed("failingTest")
 
         where:
-        type            | testSetup          | failingTest
+        type            | testSetup          | test
         "JUnit"         | jUnitSetup         | failingJUnitTest
         "JUnitPlatform" | jUnitPlatformSetup | failingJUnitPlatformTest
         "TestNG"        | testNgSetup        | failingTestNGTest
