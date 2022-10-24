@@ -38,7 +38,6 @@ public class JUnitOptions extends TestFrameworkOptions {
     public void copyFrom(JUnitOptions other) {
         replace(this.includeCategories, other.includeCategories);
         replace(this.excludeCategories, other.excludeCategories);
-        //TODO
     }
 
     private static void replace(Set<String> target, Set<String> source) {
@@ -85,4 +84,6 @@ public class JUnitOptions extends TestFrameworkOptions {
     public void setExcludeCategories(Set<String> excludeCategories) {
         this.excludeCategories = excludeCategories;
     }
+
+
 }
