@@ -36,17 +36,12 @@ import org.testng.IMethodInterceptor;
 import org.testng.ISuite;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
-import org.testng.ITestNGMethod;
-import org.testng.ITestResult;
 import org.testng.ITestRunnerFactory;
 import org.testng.TestNG;
 import org.testng.TestRunner;
-import org.testng.collections.Lists;
-import org.testng.internal.Configuration;
-import org.testng.internal.MethodInstance;
-import org.testng.internal.SuiteRunnerMap;
-import org.testng.internal.TestResult;
-import org.testng.xml.XmlSuite;
+import org.testng.internal.IConfiguration;
+import org.testng.reporters.JUnitXMLReporter;
+import org.testng.reporters.TestHTMLReporter;
 import org.testng.xml.XmlTest;
 
 import java.io.File;
@@ -54,7 +49,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 import static org.gradle.api.tasks.testing.testng.TestNGOptions.DEFAULT_CONFIG_FAILURE_POLICY;
@@ -113,7 +107,7 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
     }
 
     private void runTests() {
-        DryRunTestNG testNg = new DryRunTestNG();
+        ExtendedTestNG testNg = new ExtendedTestNG();
         testNg.setOutputDirectory(testReportDir.getAbsolutePath());
         testNg.setDefaultSuiteName(options.getDefaultSuiteName());
         testNg.setDefaultTestName(options.getDefaultTestName());
@@ -159,52 +153,12 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
             testNg.setTestClasses(testClasses.toArray(new Class<?>[0]));
         }
 
-        ITestListener listener = new TestNGTestResultProcessorAdapter(resultProcessor, idGenerator, clock);
-
         if (options.isDryRun()) {
-            testNg.initializeSuitesAndJarFile();
-            invokeVerifiedVoidMethod(testNg, "initializeCommandLineSuites");
-            invokeVerifiedVoidMethod(testNg, "initializeCommandLineSuitesGroups");
-            invokeVerifiedVoidMethod(testNg, "sanityCheck");
-
-            SuiteRunnerMap suiteRunnerMap = new SuiteRunnerMap();
-
-            for (XmlSuite xmlSuite : testNg.getXmlSuites()) {
-                invokeVerifiedMethod(testNg, "createSuiteRunners", new Class[]{SuiteRunnerMap.class, XmlSuite.class}, new Object[]{suiteRunnerMap, xmlSuite});
-            }
-
-            for (ISuite suite : suiteRunnerMap.values()) {
-
-                for (XmlTest xmlTest : suite.getXmlSuite().getTests()) {
-                    TestRunner testRunner = new TestRunner(new Configuration(), suite, xmlTest, false, new ArrayList<IInvokedMethodListener>());
-
-                    List<IMethodInstance> allTestMethods = Lists.newArrayList();
-
-                    for (ITestNGMethod testNGMethod : testRunner.getAllTestMethods()) {
-                        allTestMethods.add(new MethodInstance(testNGMethod));
-                    }
-
-                    List<IMethodInstance> filteredTestMethods = filter.intercept(allTestMethods, testRunner);
-
-                    listener.onStart(testRunner);
-
-                    for (IMethodInstance a : filteredTestMethods) {
-                        TestResult result = new TestResult();
-                        result.setTestClass(a.getMethod().getTestClass());
-                        result.setMethod(a.getMethod());
-                        result.setStatus(ITestResult.SUCCESS);
-
-                        listener.onTestStart(result);
-                        listener.onTestSuccess(result);
-                    }
-
-                    listener.onFinish(testRunner);
-                }
-            }
-        } else {
-            testNg.addListener((Object) adaptListener(listener));
-            testNg.run();
+            testNg.setTestRunnerFactory(new TestDryRunnerFactory(filter, testNg.getConfiguration()));
         }
+
+        testNg.addListener((Object) adaptListener(new TestNGTestResultProcessorAdapter(resultProcessor, idGenerator, clock)));
+        testNg.run();
     }
 
     /**
@@ -253,9 +207,9 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         return configFailurePolicyArgValue;
     }
 
-    private void invokeVerifiedMethod(DryRunTestNG testNg, String methodName, Class<?> paramClass, Object value, Object defaultValue) {
+    private void invokeVerifiedMethod(TestNG testNg, String methodName, Class<?> paramClass, Object value, Object defaultValue) {
         try {
-            JavaMethod.of(DryRunTestNG.class, Object.class, methodName, paramClass).invoke(testNg, value);
+            JavaMethod.of(TestNG.class, Object.class, methodName, paramClass).invoke(testNg, value);
         } catch (NoSuchMethodException e) {
             if (!value.equals(defaultValue)) {
                 // Should not reach this point as this is validated in the test framework implementation - just propagate the failure
@@ -264,32 +218,20 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         }
     }
 
-    private void invokeVerifiedVoidMethod(DryRunTestNG testNg, String methodName) {
-        try {
-            JavaMethod.of(TestNG.class, void.class, methodName).invoke(testNg);
-        } catch (NoSuchMethodException e) {
-            // Should not reach this point as this is validated in the test framework implementation - just propagate the failure
-            throw e;
-        }
-    }
-
-    private void invokeVerifiedMethod(TestNG testNg, String methodName, Class<?>[] paramClasses, Object[] values) {
-        try {
-            JavaMethod.of(TestNG.class, Object.class, methodName, paramClasses).invoke(testNg, values);
-        } catch (NoSuchMethodException e) {
-            // Should not reach this point as this is validated in the test framework implementation - just propagate the failure
-            throw e;
-        }
-    }
-
     private ITestListener adaptListener(ITestListener listener) {
         TestNGListenerAdapterFactory factory = new TestNGListenerAdapterFactory(applicationClassLoader);
         return factory.createAdapter(listener);
     }
 
-    private static class DryRunTestNG extends TestNG {
-        public List<XmlSuite> getXmlSuites() {
-            return m_suites;
+    private static class ExtendedTestNG extends TestNG {
+        @Override
+        public void setTestRunnerFactory(ITestRunnerFactory itrf) {
+            super.setTestRunnerFactory(itrf);
+        }
+
+        @Override
+        public IConfiguration getConfiguration() {
+            return super.getConfiguration();
         }
     }
 
@@ -306,8 +248,7 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
         private final TestSelectionMatcher matcher;
 
         public SelectedTestsFilter(
-            Set<String> includedTests, Set<String> excludedTests,
-            Set<String> includedTestsCommandLine
+            Set<String> includedTests, Set<String> excludedTests, Set<String> includedTestsCommandLine
         ) {
             matcher = new TestSelectionMatcher(includedTests, excludedTests, includedTestsCommandLine);
         }
@@ -317,14 +258,31 @@ public class TestNGTestClassProcessor implements TestClassProcessor {
             ISuite suite = context.getSuite();
             List<IMethodInstance> filtered = new LinkedList<IMethodInstance>();
             for (IMethodInstance candidate : methods) {
-                if (matcher.matchesTest(candidate.getMethod().getTestClass().getName(), candidate.getMethod().getMethodName())
-                    || matcher.matchesTest(suite.getName(), null)) {
+                if (matcher.matchesTest(candidate.getMethod().getTestClass().getName(), candidate.getMethod().getMethodName()) || matcher.matchesTest(suite.getName(), null)) {
                     filtered.add(candidate);
                 }
             }
 
 
             return filtered;
+        }
+    }
+
+    private static class TestDryRunnerFactory implements ITestRunnerFactory {
+        private final IMethodInterceptor methodInterceptor;
+        private final IConfiguration configuration;
+
+        private TestDryRunnerFactory(IMethodInterceptor methodInterceptor, IConfiguration configuration) {
+            this.methodInterceptor = methodInterceptor;
+            this.configuration = configuration;
+        }
+
+        @Override
+        public TestRunner newTestRunner(ISuite suite, XmlTest test, List<IInvokedMethodListener> listeners) {
+            TestRunner testDryRunner = new TestDryRunner(configuration, suite, test, false, listeners, methodInterceptor);
+            testDryRunner.addListener(new TestHTMLReporter());
+            testDryRunner.addListener(new JUnitXMLReporter());
+            return testDryRunner;
         }
     }
 }

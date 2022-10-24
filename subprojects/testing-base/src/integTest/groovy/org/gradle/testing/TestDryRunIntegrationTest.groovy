@@ -31,30 +31,16 @@ class TestDryRunIntegrationTest extends AbstractIntegrationSpec {
 
         and:
         file("src/test/java/SomeTest.java") << failingTest
-
-        and:
-        TestExecutionResult executionResult
-        switch (type) {
-            case "JUnit":
-            case "JUnitPlatform":
-                executionResult = new DefaultTestExecutionResult(testDirectory)
-                break
-            case "TestNG":
-                executionResult = new TestNGExecutionResult(testDirectory)
-                break
-            default:
-                throw new IllegalArgumentException()
-        }
+        TestExecutionResult executionResult = new DefaultTestExecutionResult(testDirectory)
 
         expect:
-        succeeds("test", "--test-dry-run", "--info")
-//        System.exit(0)
-//        executionResult.testClass("SomeTest").assertTestPassed("failingTest")
+        succeeds("test", "--test-dry-run")
+        executionResult.testClass("SomeTest").assertTestPassed("failingTest")
 
         where:
         type            | testSetup          | failingTest
-//        "JUnit"         | jUnitSetup         | failingJUnitTest
-//        "JUnitPlatform" | jUnitPlatformSetup | failingJUnitPlatformTest
+        "JUnit"         | jUnitSetup         | failingJUnitTest
+        "JUnitPlatform" | jUnitPlatformSetup | failingJUnitPlatformTest
         "TestNG"        | testNgSetup        | failingTestNGTest
     }
 
@@ -77,7 +63,7 @@ class TestDryRunIntegrationTest extends AbstractIntegrationSpec {
         test {
             useTestNG()
         }
-        dependencies { testImplementation 'org.testng:testng:6.9.10' }
+        dependencies { testImplementation 'org.testng:testng:6.3.1' }
         """
 
     @Shared
