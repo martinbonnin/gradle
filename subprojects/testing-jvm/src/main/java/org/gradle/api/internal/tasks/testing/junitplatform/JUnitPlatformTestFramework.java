@@ -62,6 +62,7 @@ public class JUnitPlatformTestFramework implements TestFramework {
     }
 
     private JUnitPlatformTestFramework(DefaultTestFilter filter, boolean useImplementationDependencies, JUnitPlatformOptions options) {
+        TestDryR
         this.filter = filter;
         this.useImplementationDependencies = useImplementationDependencies;
         this.options = options;

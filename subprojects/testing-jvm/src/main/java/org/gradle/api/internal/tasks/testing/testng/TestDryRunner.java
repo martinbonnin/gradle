@@ -35,7 +35,7 @@ import org.testng.xml.XmlTest;
 import java.util.Date;
 import java.util.List;
 
-public class TestDryRunner extends TestRunner {
+class TestDryRunner extends TestRunner {
     private Date startDate = null;
     private Date endDate = null;
     private final IMethodInterceptor methodInterceptor;
@@ -90,7 +90,7 @@ public class TestDryRunner extends TestRunner {
         List<IMethodInstance> filteredTestMethods = methodInterceptor.intercept(allTestMethods, this);
 
         for (IMethodInstance method : filteredTestMethods) {
-            TestResult result = new TestResult(method.getMethod().getTestClass(), method.getInstance(), method.getMethod(), null, 0, 1);
+            TestResult result = new TestResult(method.getMethod().getTestClass(), method.getInstance(), method.getMethod(), null, 0, 0);
             result.setStatus(ITestResult.SUCCESS);
             resultMap.addResult(result, method.getMethod());
         }

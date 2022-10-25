@@ -265,7 +265,7 @@ class JUnitTestClassProcessorTest extends Specification {
     def "executes multiple specific methods"() {
         setup:
         classProcessor = withSpec(new JUnitSpec([] as Set, [] as Set, [ATestClassWithSeveralMethods.name + ".pass",
-                                                                       ATestClassWithSeveralMethods.name + ".pass2"] as Set, [] as Set, [] as Set, false))
+                ATestClassWithSeveralMethods.name + ".pass2"] as Set, [] as Set, [] as Set, false))
 
         when:
         process(ATestClassWithSeveralMethods)
