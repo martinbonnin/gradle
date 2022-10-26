@@ -80,5 +80,10 @@ class DeprecatedFeaturesListenerManagerAction(
                     .nagUser()
             }
         }
+
+        override fun onConventionAccess(invocationDescription: String, task: TaskInternal) {
+            // TODO: create separate documentation section for conventions
+            onProjectAccess(invocationDescription, task)
+        }
     }
 }
