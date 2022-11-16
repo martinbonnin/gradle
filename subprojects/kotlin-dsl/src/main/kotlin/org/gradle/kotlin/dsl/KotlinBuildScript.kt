@@ -47,7 +47,7 @@ import kotlin.script.templates.ScriptTemplateDefinition
         "-jvm-target", "1.8",
         "-Xjvm-default=all",
         "-Xjsr305=strict",
-        "-XXLanguage:+DisableCompatibilityModeForNewInference"
+        "-XXLanguage:+DisableCompatibilityModeForNewInference",
     ],
     provider = KotlinBuildScriptTemplateAdditionalCompilerArgumentsProvider::class
 )
