@@ -1408,6 +1408,13 @@ public abstract class AbstractGradleExecuter implements GradleExecuter, Resettab
                     // Deprecation warning is expected
                     i++;
                     i = skipStackTrace(lines, i);
+                } else if (line.startsWith("kotlinOptions.freeCompilerArgs were changed on task execution phase:")) {
+                    // Kotlin.freeCompilerArgs deprecation not handled.
+                    // Maybe supress it via system propery https://youtrack.jetbrains.com/issue/KT-54888 or find a better option
+                    i++;
+                    if (i < lines.size() && lines.get(i).startsWith("This behaviour is deprecated and become an error in future releases!")) {
+                        i++;
+                    }
                 } else if (line.matches(".*\\s+deprecated.*")) {
                     if (checkDeprecations && expectedGenericDeprecationWarnings <= 0) {
                         throw new AssertionError(String.format("%s line %d contains a deprecation warning: %s%n=====%n%s%n=====%n", displayName, i + 1, line, output));
