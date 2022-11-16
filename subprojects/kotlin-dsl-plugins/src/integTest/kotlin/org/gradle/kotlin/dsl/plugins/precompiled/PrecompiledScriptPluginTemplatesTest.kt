@@ -449,7 +449,7 @@ class PrecompiledScriptPluginTemplatesTest : AbstractPrecompiledScriptPluginTest
     fun `nested plugins block fails to compile with reasonable message`() {
 
         withKotlinDslPlugin()
-        withPrecompiledKotlinScript(
+        val precompiledScript = withPrecompiledKotlinScript(
             "my-project-plugin.gradle.kts",
             """
             project(":nested") {
@@ -465,7 +465,7 @@ class PrecompiledScriptPluginTemplatesTest : AbstractPrecompiledScriptPluginTest
                 "Execution failed for task ':compileKotlin'."
             )
             assertHasErrorOutput(
-                """my-project-plugin.gradle.kts: (3, 17): Using 'plugins(PluginDependenciesSpec.() -> Unit): Nothing' is an error. The plugins {} block must not be used here. If you need to apply a plugin imperatively, please use apply<PluginType>() or apply(plugin = "id") instead."""
+                """e: file://${precompiledScript.absolutePath.replace("test files", "test%20files")}:3:17 Using 'plugins(PluginDependenciesSpec.() -> Unit): Nothing' is an error. The plugins {} block must not be used here. If you need to apply a plugin imperatively, please use apply<PluginType>() or apply(plugin = "id") instead."""
             )
         }
     }
