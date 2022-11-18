@@ -26,6 +26,7 @@ object KotlinDslPluginSupport {
             "-Xjsr305=strict",
             "-XXLanguage:+DisableCompatibilityModeForNewInference",
             "-Xuse-ir",
+            "-Xsam-conversions=class",
             // Suppress "Language version 1.4 is deprecated and its support will be removed in a future version of Kotlin"
             // TODO can be removed once we drop support for Kotlin 1.4
             "-Xsuppress-version-warnings"
