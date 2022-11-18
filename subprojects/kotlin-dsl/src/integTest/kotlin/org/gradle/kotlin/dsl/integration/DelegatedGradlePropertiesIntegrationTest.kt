@@ -1,10 +1,9 @@
 package org.gradle.kotlin.dsl.integration
 
 import org.gradle.kotlin.dsl.fixtures.AbstractKotlinIntegrationTest
-
 import org.hamcrest.CoreMatchers.containsString
-
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Ignore
 import org.junit.Test
 
 
@@ -43,6 +42,7 @@ class DelegatedGradlePropertiesIntegrationTest : AbstractKotlinIntegrationTest()
     }
 
     @Test
+    @Ignore("Disabled due to Kotlin compiler bug")
     fun `delegated properties follow Gradle mechanics and allow to model optional properties via nullable kotlin types`() {
 
         // given: build root gradle.properties file

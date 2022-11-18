@@ -15,10 +15,12 @@
  */
 package org.gradle.plugin.use
 
+
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.test.fixtures.plugin.PluginBuilder
 import org.gradle.test.fixtures.server.http.MavenHttpPluginRepository
 import org.junit.Rule
+import spock.lang.Ignore
 
 class VersionInSettingsPluginUseIntegrationTest extends AbstractIntegrationSpec {
 
@@ -53,6 +55,7 @@ class VersionInSettingsPluginUseIntegrationTest extends AbstractIntegrationSpec 
         verifyPluginApplied('1.0')
     }
 
+    @Ignore("Disabled due to Kotlin compiler bug")
     def "can define plugin version in kotlin settings script"() {
         when:
         settingsFile.delete()

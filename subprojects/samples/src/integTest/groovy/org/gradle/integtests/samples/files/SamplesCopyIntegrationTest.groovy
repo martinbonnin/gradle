@@ -20,6 +20,7 @@ import org.gradle.integtests.fixtures.AbstractSampleIntegrationTest
 import org.gradle.integtests.fixtures.Sample
 import org.gradle.integtests.fixtures.UsesSample
 import org.junit.Rule
+import spock.lang.Ignore
 
 class SamplesCopyIntegrationTest extends AbstractSampleIntegrationTest {
 
@@ -63,6 +64,7 @@ class SamplesCopyIntegrationTest extends AbstractSampleIntegrationTest {
     }
 
     @UsesSample("files/copy")
+    @Ignore("Disabled due to Kotlin compiler bug")
     def "can copy a single file using the file method with #dsl dsl"() {
         given:
         def dslDir = sample.dir.file(dsl)
