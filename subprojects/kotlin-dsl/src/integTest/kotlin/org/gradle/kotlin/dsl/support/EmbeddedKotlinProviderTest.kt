@@ -57,7 +57,7 @@ class EmbeddedKotlinProviderTest : AbstractKotlinIntegrationTest() {
             """
         )
 
-        val result = build("buildEnvironment")
+        val result = build("buildEnvironment", "--stacktrace")
         listOf("stdlib", "reflect").forEach { module ->
             assertThat(result.output, containsString("org.jetbrains.kotlin:kotlin-$module:1.6.10 -> $embeddedKotlinVersion"))
         }

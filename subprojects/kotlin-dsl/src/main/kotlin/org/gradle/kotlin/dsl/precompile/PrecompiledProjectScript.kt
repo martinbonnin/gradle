@@ -50,9 +50,9 @@ open class PrecompiledProjectScript(
      * @see [PluginDependenciesSpec]
      */
     @Suppress("unused")
-    fun plugins(@Suppress("unused_parameter") block: PluginDependenciesSpec.() -> Unit) {
+    fun plugins(@Suppress("unused_parameter") block: PluginDependenciesSpecScope.() -> Unit) {
         block(
-            object : PluginDependenciesSpec {
+            PluginDependenciesSpecScope(object : PluginDependenciesSpec {
                 override fun id(id: String): PluginDependencySpec {
                     project.pluginManager.apply(id)
                     return NullPluginDependencySpec
@@ -66,7 +66,7 @@ open class PrecompiledProjectScript(
                 override fun alias(notation: ProviderConvertible<PluginDependency>): PluginDependencySpec {
                     return alias(notation.asProvider())
                 }
-            }
+            })
         )
     }
 

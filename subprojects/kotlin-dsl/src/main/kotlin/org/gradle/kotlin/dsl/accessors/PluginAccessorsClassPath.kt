@@ -21,6 +21,7 @@ import kotlinx.metadata.KmTypeVisitor
 import kotlinx.metadata.flagsOf
 import kotlinx.metadata.jvm.JvmMethodSignature
 import org.gradle.api.Project
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.internal.file.FileCollectionFactory
 import org.gradle.api.internal.initialization.ClassLoaderScope
 import org.gradle.api.internal.project.ProjectInternal
@@ -36,6 +37,7 @@ import org.gradle.internal.fingerprint.CurrentFileCollectionFingerprint
 import org.gradle.internal.hash.ClassLoaderHierarchyHasher
 import org.gradle.internal.hash.HashCode
 import org.gradle.internal.snapshot.ValueSnapshot
+import org.gradle.kotlin.dsl.*
 import org.gradle.kotlin.dsl.cache.KotlinDslWorkspaceProvider
 import org.gradle.kotlin.dsl.codegen.fileHeader
 import org.gradle.kotlin.dsl.codegen.fileHeaderFor
@@ -74,6 +76,7 @@ import org.gradle.kotlin.dsl.support.bytecode.writePropertyOf
 import org.gradle.kotlin.dsl.support.useToRun
 import org.gradle.plugin.use.PluginDependenciesSpec
 import org.gradle.plugin.use.PluginDependencySpec
+import org.jetbrains.kotlin.builtins.StandardNames.FqNames.target
 import org.jetbrains.org.objectweb.asm.ClassWriter
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 import java.io.BufferedWriter
@@ -125,6 +128,7 @@ class GeneratePluginAccessors(
 
     companion object {
         const val BUILD_SRC_CLASSLOADER_INPUT_PROPERTY = "buildSrcClassLoader"
+        const val VERSION_CATALOGS_INPUT_PROPERTY = "versionCatalogs"
         const val SOURCES_OUTPUT_PROPERTY = "sources"
         const val CLASSES_OUTPUT_PROPERTY = "classes"
     }
@@ -133,11 +137,22 @@ class GeneratePluginAccessors(
         val workspace = executionRequest.workspace
         kotlinScriptClassPathProviderOf(rootProject).run {
             withAsynchronousIO(rootProject) {
+                // TODO collect facade files and write module metadata at the end
+                val srcDir = getSourcesOutputDir(workspace)
+                val binDir = getClassesOutputDir(workspace)
                 buildPluginAccessorsFor(
                     pluginDescriptorsClassPath = exportClassPathFromHierarchyOf(buildSrcClassLoaderScope),
-                    srcDir = getSourcesOutputDir(workspace),
-                    binDir = getClassesOutputDir(workspace)
+                    srcDir = srcDir,
+                    binDir = binDir
                 )
+                val versionCatalogs = rootProject.extensions.findByType<VersionCatalogsExtension>()
+                if (versionCatalogs != null) {
+                    buildPluginsBlockVersionCatalogAccessorsFor(
+                        versionCatalogs = versionCatalogs,
+                        srcDir = srcDir,
+                        binDir = binDir
+                    )
+                }
             }
         }
         return object : UnitOfWork.WorkOutput {
@@ -162,6 +177,9 @@ class GeneratePluginAccessors(
 
     override fun visitIdentityInputs(visitor: InputVisitor) {
         visitor.visitInputProperty(BUILD_SRC_CLASSLOADER_INPUT_PROPERTY) { classLoaderHash }
+//        visitor.visitInputProperty(VERSION_CATALOGS_INPUT_PROPERTY) {
+//            buildPluginsBlockVersionCatalogInputFor(rootProject.extensions.findByType())
+//        }
     }
 
     override fun visitOutputs(workspace: File, visitor: UnitOfWork.OutputVisitor) {
@@ -280,6 +298,7 @@ fun ClassWriter.emitAccessorMethodFor(accessor: PluginAccessor, signature: JvmMe
                 INVOKESPECIAL(returnType.internalName, "<init>", groupTypeConstructorSignature)
                 ARETURN()
             }
+
             is PluginAccessor.ForPlugin -> {
                 GETPLUGINS(receiverType)
                 LDC(accessor.id)
@@ -343,6 +362,7 @@ fun BufferedWriter.appendSourceCodeForPluginAccessors(
                     )
                 )
             }
+
             is PluginAccessor.ForGroup -> {
                 val groupType = extension.returnType.sourceName
                 appendReproducibleNewLine(
@@ -459,6 +479,7 @@ fun pluginAccessorsFor(pluginTrees: Map<String, PluginTree>, extendedType: TypeS
                 )
                 yieldAll(pluginAccessorsFor(pluginTree.plugins, groupTypeSpec))
             }
+
             is PluginTree.PluginSpec -> {
                 yield(
                     PluginAccessor.ForPlugin(
