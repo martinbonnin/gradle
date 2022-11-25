@@ -350,7 +350,7 @@ val Project.predictiveTestSelectionEnabled: Provider<Boolean>
 
 
 val Project.testDistributionEnabled: Boolean
-    get() = systemProperty(TEST_DISTRIBUTION_ENABLED).orNull?.toBoolean() == true
+    get() = false
 
 
 // Controls the test distribution partition size. The test classes smaller than this value will be merged into a "partition"
@@ -359,8 +359,7 @@ val Project.maxTestDistributionPartitionSecond: Long?
 
 
 val Project.maxParallelForks: Int
-    get() = gradleProperty(MAX_PARALLEL_FORKS).getOrElse("4").toInt() *
-        environmentVariable("BUILD_AGENT_VARIANT").getOrElse("").let { if (it == "AX41") 2 else 1 }
+    get() = gradleProperty(MAX_PARALLEL_FORKS).getOrNull()?.toInt() ?: throw IllegalStateException()
 
 
 val Project.autoDownloadAndroidStudio: Boolean

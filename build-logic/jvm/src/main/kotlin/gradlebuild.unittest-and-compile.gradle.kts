@@ -22,7 +22,6 @@ import gradlebuild.basics.flakyTestStrategy
 import gradlebuild.basics.maxParallelForks
 import gradlebuild.basics.maxTestDistributionPartitionSecond
 import gradlebuild.basics.predictiveTestSelectionEnabled
-import gradlebuild.basics.rerunAllTests
 import gradlebuild.basics.tasks.ClasspathManifest
 import gradlebuild.basics.testDistributionEnabled
 import gradlebuild.basics.testJavaVendor
@@ -228,9 +227,7 @@ fun Test.isUnitTest() = listOf("test", "writePerformanceScenarioDefinitions", "w
 fun Test.usesEmbeddedExecuter() = name.startsWith("embedded")
 
 fun Test.configureRerun() {
-    if (project.rerunAllTests.get()) {
-        doNotTrackState("All tests should re-run")
-    }
+    doNotTrackState("All tests should re-run")
 }
 
 fun Test.determineMaxRetries() = when {
