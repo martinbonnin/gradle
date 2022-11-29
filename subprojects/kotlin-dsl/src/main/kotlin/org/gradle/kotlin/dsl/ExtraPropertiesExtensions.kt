@@ -39,8 +39,7 @@ val ExtensionAware.extra: ExtraPropertiesExtension
  * Provides property delegate for typed access to extra properties.
  */
 operator fun ExtraPropertiesExtension.provideDelegate(receiver: Any?, property: KProperty<*>): MutablePropertyDelegate =
-    if (property.returnType.isMarkedNullable) NullableExtraPropertyDelegate(this, property.name)
-    else NonNullExtraPropertyDelegate(this, property.name)
+    NullableExtraPropertyDelegate(this, property.name)
 
 
 private

@@ -45,8 +45,7 @@ interface MutablePropertyDelegate : PropertyDelegate {
 internal
 fun propertyDelegateFor(target: Any, property: KProperty<*>): PropertyDelegate =
     dynamicObjectFor(target).let { owner ->
-        if (property.returnType.isMarkedNullable) NullableDynamicPropertyDelegate(owner, property.name)
-        else NonNullDynamicPropertyDelegate(owner, property.name, { target.toString() })
+        NullableDynamicPropertyDelegate(owner, property.name)
     }
 
 
