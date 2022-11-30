@@ -110,8 +110,19 @@ public class JUnitTestClassExecutor implements Action<String> {
         if (options.isDryRun()) {
             try {
                 for (Description includedTest : collectingFilter.includedTests) {
-                    listener.testStarted(includedTest);
-                    listener.testFinished(includedTest);
+                    if (includedTest.isSuite()) {
+                        listener.testSuiteStarted(includedTest);
+
+                        for (Description test : includedTest.getChildren()) {
+                            listener.testStarted(test);
+                            listener.testFinished(test);
+                        }
+
+                        listener.testSuiteFinished(includedTest);
+                    } else {
+                        listener.testStarted(includedTest);
+                        listener.testFinished(includedTest);
+                    }
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -208,7 +219,11 @@ public class JUnitTestClassExecutor implements Action<String> {
         public boolean shouldRun(Description description) {
             boolean result = delegate.shouldRun(description);
             if (result) {
-                includedTests.add(description);
+                description.
+                List<Description> lastIncludedTestChildren = includedTests.isEmpty() ? new ArrayList<Description>() : includedTests.get(includedTests.size() - 1).getChildren();
+                if (description.isSuite() || !lastIncludedTestChildren.contains(description)) {
+                    includedTests.add(description);
+                }
             }
             return result;
         }

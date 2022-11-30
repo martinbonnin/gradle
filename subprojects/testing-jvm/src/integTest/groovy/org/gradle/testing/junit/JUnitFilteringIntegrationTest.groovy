@@ -25,7 +25,7 @@ import spock.lang.Issue
 import static org.gradle.testing.fixture.JUnitCoverage.*
 import static org.gradle.testing.fixture.JUnitMultiVersionIntegrationSpec.*
 
-@TargetCoverage({ LARGE_COVERAGE + JUNIT_VINTAGE})
+@TargetCoverage({[NEWEST]})
 class JUnitFilteringIntegrationTest extends AbstractTestFilteringIntegrationTest {
 
     String imports = "org.junit.*"
@@ -140,7 +140,7 @@ class JUnitFilteringIntegrationTest extends AbstractTestFilteringIntegrationTest
         theParameterizedFiles()
 
         when:
-        run("test", "--tests", "*ParameterizedFoo.pass*")
+        run("test", "--tests", "*ParameterizedFoo.pass*", "--test-dry-run", "--debug-jvm")
 
         then:
         def result = new DefaultTestExecutionResult(testDirectory)
@@ -154,7 +154,7 @@ class JUnitFilteringIntegrationTest extends AbstractTestFilteringIntegrationTest
         theSuiteFiles()
 
         when:
-        run("test", "--tests", "*AllFooTests")
+        run("test", "--tests", "*AllFooTests",  "--test-dry-run")
 
         then:
         def result = new DefaultTestExecutionResult(testDirectory)
