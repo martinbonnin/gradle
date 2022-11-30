@@ -21,6 +21,7 @@ import org.gradle.kotlin.dsl.tooling.models.KotlinBuildScriptModel
 import org.gradle.test.fixtures.file.LeaksFileHandles
 import org.gradle.tooling.model.kotlin.dsl.KotlinDslScriptModel
 import org.gradle.test.fixtures.Flaky
+import spock.lang.Ignore
 
 import java.lang.reflect.Proxy
 
@@ -54,6 +55,7 @@ class KotlinDslScriptsModelCrossVersionSpec extends AbstractKotlinDslScriptsMode
         }
     }
 
+    @Ignore
     def "multi-scripts model is dehydrated over the wire"() {
 
         given:
