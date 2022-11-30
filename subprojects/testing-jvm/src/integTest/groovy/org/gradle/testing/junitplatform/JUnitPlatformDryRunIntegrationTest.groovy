@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package org.gradle.testing.junit
+package org.gradle.testing.junitplatform
 
 import org.gradle.integtests.fixtures.DefaultTestExecutionResult
-import org.gradle.integtests.fixtures.TargetCoverage
 import org.gradle.integtests.fixtures.TestExecutionResult
 import org.gradle.integtests.fixtures.executer.ExecutionResult
 
-import static org.gradle.testing.fixture.JUnitCoverage.getJUNIT_4_LATEST
-import static org.gradle.testing.fixture.JUnitCoverage.getVINTAGE
-
-@TargetCoverage({ JUNIT_4_LATEST + VINTAGE })
-class JUnitDryRunIntegrationTest extends JUnitFilteringIntegrationTest {
+class JUnitPlatformDryRunIntegrationTest extends JUnitPlatformFilteringIntegrationTest {
 
     @Override
     protected ExecutionResult run(String... tasks) {
@@ -35,7 +30,7 @@ class JUnitDryRunIntegrationTest extends JUnitFilteringIntegrationTest {
     def "dry run test is skipping execution and considering as passed in report"() {
         given:
         file("src/test/java/SomeTest.java") << """
-        import org.junit.*;
+        import org.junit.jupiter.api.*;
 
         public class SomeTest {
             @Test public void failingTest() {

@@ -90,8 +90,7 @@ public class JUnitTestClassExecutor implements Action<String> {
             }
         }
 
-        IncludedMethodNameCollectingFilter collectingFilter = new IncludedMethodNameCollectingFilter(testFilter);
-        filters.add(collectingFilter);
+        filters.add(testFilter);
 
         if (runner instanceof Filterable) {
             Filterable filterable = (Filterable) runner;
@@ -108,30 +107,12 @@ public class JUnitTestClassExecutor implements Action<String> {
         }
 
         if (options.isDryRun()) {
-            try {
-                for (Description includedTest : collectingFilter.includedTests) {
-                    if (includedTest.isSuite()) {
-                        listener.testSuiteStarted(includedTest);
-
-                        for (Description test : includedTest.getChildren()) {
-                            listener.testStarted(test);
-                            listener.testFinished(test);
-                        }
-
-                        listener.testSuiteFinished(includedTest);
-                    } else {
-                        listener.testStarted(includedTest);
-                        listener.testFinished(includedTest);
-                    }
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            RunNotifier notifier = new RunNotifier();
-            notifier.addListener(listener);
-            runner.run(notifier);
+            runner = new JUnitDryRunner(runner);
         }
+
+        RunNotifier notifier = new RunNotifier();
+        notifier.addListener(listener);
+        runner.run(notifier);
     }
 
     // https://github.com/gradle/gradle/issues/2319
@@ -203,34 +184,6 @@ public class JUnitTestClassExecutor implements Action<String> {
         @Override
         public String describe() {
             return "Includes matching test methods";
-        }
-    }
-
-    private static class IncludedMethodNameCollectingFilter extends org.junit.runner.manipulation.Filter {
-
-        private final Filter delegate;
-        private final List<Description> includedTests = new ArrayList<Description>();
-
-        IncludedMethodNameCollectingFilter(org.junit.runner.manipulation.Filter delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public boolean shouldRun(Description description) {
-            boolean result = delegate.shouldRun(description);
-            if (result) {
-                description.
-                List<Description> lastIncludedTestChildren = includedTests.isEmpty() ? new ArrayList<Description>() : includedTests.get(includedTests.size() - 1).getChildren();
-                if (description.isSuite() || !lastIncludedTestChildren.contains(description)) {
-                    includedTests.add(description);
-                }
-            }
-            return result;
-        }
-
-        @Override
-        public String describe() {
-            return "Collects included tests";
         }
     }
 
