@@ -16,41 +16,26 @@
 
 package org.gradle.testing.testng
 
+import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.DefaultTestExecutionResult
-import org.gradle.integtests.fixtures.MultiVersionIntegrationSpec
-import org.gradle.integtests.fixtures.TargetCoverage
 import org.gradle.integtests.fixtures.TestExecutionResult
-import org.gradle.testing.fixture.TestNGCoverage
 
-@TargetCoverage({ TestNGCoverage.SUPPORTED_BY_JDK })
-class TestNGDryRunIntegrationTest extends MultiVersionIntegrationSpec {
+class TestNGDryRunIntegrationTest extends AbstractIntegrationSpec {
 
     def "dry run test is skipping execution and considering as passed in report"() {
         given:
-        buildFile << testNgSetup()
-
-        and:
-        file("src/test/java/SomeTest.java") << failingTestNGTest
-        TestExecutionResult executionResult = new DefaultTestExecutionResult(testDirectory)
-
-        expect:
-        succeeds("test", "--test-dry-run")
-        executionResult.testClass("SomeTest").assertTestPassed("failingTest")
-    }
-
-    private String testNgSetup() {
-        return """
+        buildFile << """
         apply plugin: 'java-library'
         ${mavenCentralRepository()}
 
         test {
             useTestNG()
         }
-        dependencies { testImplementation 'org.testng:testng:${versionNumber}' }
+        dependencies { testImplementation 'org.testng:testng:6.3.1' }
         """
-    }
 
-    private String failingTestNGTest = """
+        and:
+        file("src/test/java/SomeTest.java") << """
         import org.testng.annotations.*;
 
         public class SomeTest {
@@ -59,4 +44,10 @@ class TestNGDryRunIntegrationTest extends MultiVersionIntegrationSpec {
             }
         }
         """
+        TestExecutionResult executionResult = new DefaultTestExecutionResult(testDirectory)
+
+        expect:
+        succeeds("test", "--test-dry-run")
+        executionResult.testClass("SomeTest").assertTestPassed("failingTest")
+    }
 }
