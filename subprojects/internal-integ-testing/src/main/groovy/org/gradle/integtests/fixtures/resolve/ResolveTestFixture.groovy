@@ -41,12 +41,12 @@ import org.gradle.test.fixtures.file.TestFile
 import org.junit.ComparisonFailure
 
 /**
- * A test fixture that injects a task into a build that resolves a dependency configuration and does some validation of the resulting graph, to
+ * A test fixture that injects a "checkDeps" task into a build that resolves a dependency configuration and does some validation of the resulting graph, to
  * ensure that the old and new dependency graphs plus the artifacts and files are as expected and well-formed.
  */
 class ResolveTestFixture {
     final TestFile buildFile
-    final String config
+    String config
     private String defaultConfig = "default"
     private boolean buildArtifacts = true
     private boolean strictReasonsCheck
@@ -132,7 +132,7 @@ $content
      * Verifies the result of executing the task injected by {@link #prepare()}. The closure delegates to a {@link GraphBuilder} instance.
      */
     void expectGraph(@DelegatesTo(GraphBuilder) Closure closure) {
-        def graph = new GraphBuilder(defaultConfig)
+        def graph = new GraphBuilder()
         closure.resolveStrategy = Closure.DELEGATE_ONLY
         closure.delegate = graph
         closure.call()
@@ -390,9 +390,9 @@ $content
                 equals &= actualSorted.get(i).startsWith(expectedSorted.get(i))
             }
         }
-        def actualFormatted = Joiner.on("\n").join(actualSorted)
-        def expectedFormatted = Joiner.on("\n").join(expectedSorted)
         if (!equals) {
+            def actualFormatted = Joiner.on("\n").join(actualSorted)
+            def expectedFormatted = Joiner.on("\n").join(expectedSorted)
             throw new ComparisonFailure("Result contains unexpected $compType", expectedFormatted, actualFormatted);
         }
     }
@@ -400,13 +400,8 @@ $content
     static class GraphBuilder {
         private final Map<String, NodeBuilder> nodes = [:]
         private NodeBuilder root
-        private String defaultConfig
 
         final Set<String> virtualConfigurations = []
-
-        GraphBuilder(String defaultConfig) {
-            this.defaultConfig = defaultConfig
-        }
 
         Collection<NodeBuilder> getNodes() {
             return nodes.values()
@@ -699,7 +694,7 @@ $content
         /**
          * Defines a dependency on the given project. The closure delegates to a {@link NodeBuilder} instance that represents the target node.
          */
-        NodeBuilder project(String path, String value, @DelegatesTo(NodeBuilder) Closure cl) {
+        NodeBuilder project(String path, String value, @DelegatesTo(NodeBuilder) Closure cl = {}) {
             def node = addNode("project $path", value)
             cl.resolveStrategy = Closure.DELEGATE_ONLY
             cl.delegate = node
@@ -733,19 +728,11 @@ $content
         }
 
         /**
-         * Defines a dependency from the current node to the given node.
-         */
-        NodeBuilder edge(String requested, String selectedModuleVersionId) {
-            def node = graph.node(selectedModuleVersionId, selectedModuleVersionId)
-            deps << new EdgeBuilder(this, requested, node)
-            return node
-        }
-
-        /**
          * Defines a dependency from the current node to the given node. The closure delegates to a {@link NodeBuilder} instance that represents the target node.
          */
-        NodeBuilder edge(String requested, String selectedModuleVersionId, @DelegatesTo(NodeBuilder) Closure cl) {
-            def node = edge(requested, selectedModuleVersionId)
+        NodeBuilder edge(String requested, String selectedModuleVersionId, @DelegatesTo(NodeBuilder) Closure cl = {}) {
+            def node = graph.node(selectedModuleVersionId, selectedModuleVersionId)
+            deps << new EdgeBuilder(this, requested, node)
             cl.resolveStrategy = Closure.DELEGATE_ONLY
             cl.delegate = node
             cl.call()
@@ -755,7 +742,7 @@ $content
         /**
          * Defines a dependency from the current node to the given node. The closure delegates to a {@link NodeBuilder} instance that represents the target node.
          */
-        NodeBuilder edge(String requested, String id, String selectedModuleVersionId, @DelegatesTo(NodeBuilder) Closure cl) {
+        NodeBuilder edge(String requested, String id, String selectedModuleVersionId, @DelegatesTo(NodeBuilder) Closure cl = {}) {
             def node = graph.node(id, selectedModuleVersionId)
             deps << new EdgeBuilder(this, requested, node)
             cl.resolveStrategy = Closure.DELEGATE_ONLY
