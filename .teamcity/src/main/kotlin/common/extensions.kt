@@ -33,6 +33,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.Dependencies
 import jetbrains.buildServer.configs.kotlin.v2019_2.FailureAction
 import jetbrains.buildServer.configs.kotlin.v2019_2.RelativeId
 import jetbrains.buildServer.configs.kotlin.v2019_2.Requirements
+import jetbrains.buildServer.configs.kotlin.v2019_2.ReuseBuilds
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.GradleBuildStep
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnText
@@ -218,6 +219,7 @@ fun Dependencies.dependsOn(buildTypeId: RelativeId) {
         snapshot {
             onDependencyFailure = FailureAction.FAIL_TO_START
             onDependencyCancel = FailureAction.FAIL_TO_START
+            reuseBuilds = ReuseBuilds.SUCCESSFUL
         }
     }
 }

@@ -6,6 +6,7 @@ import common.toCapitalized
 import jetbrains.buildServer.configs.kotlin.v2019_2.Dependencies
 import jetbrains.buildServer.configs.kotlin.v2019_2.FailureAction
 import jetbrains.buildServer.configs.kotlin.v2019_2.RelativeId
+import jetbrains.buildServer.configs.kotlin.v2019_2.ReuseBuilds
 import jetbrains.buildServer.configs.kotlin.v2019_2.SnapshotDependency
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
@@ -65,6 +66,7 @@ class StagePasses(model: CIBuildModel, stage: Stage, prevStage: Stage?, stagePro
                 snapshot {
                     onDependencyFailure = FailureAction.FAIL_TO_START
                     onDependencyCancel = FailureAction.FAIL_TO_START
+                    reuseBuilds = ReuseBuilds.SUCCESSFUL
                 }
             }
         }
@@ -95,6 +97,7 @@ fun <T : BaseGradleBuildType> Dependencies.snapshotDependencies(buildTypes: Iter
                     onDependencyFailure = FailureAction.ADD_PROBLEM
                     onDependencyCancel = FailureAction.FAIL_TO_START
                 }
+                reuseBuilds = ReuseBuilds.SUCCESSFUL
                 snapshotConfig(buildType)
             }
         }
