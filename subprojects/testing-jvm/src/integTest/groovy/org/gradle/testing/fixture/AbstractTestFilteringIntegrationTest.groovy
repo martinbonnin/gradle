@@ -17,6 +17,7 @@ package org.gradle.testing.fixture
 
 import org.gradle.integtests.fixtures.DefaultTestExecutionResult
 import org.gradle.integtests.fixtures.MultiVersionIntegrationSpec
+import org.junit.Assume
 import spock.lang.Issue
 
 abstract class AbstractTestFilteringIntegrationTest extends MultiVersionIntegrationSpec {
@@ -24,6 +25,7 @@ abstract class AbstractTestFilteringIntegrationTest extends MultiVersionIntegrat
     abstract String getImports()
     abstract String getFramework()
     abstract String getDependencies()
+    abstract boolean isDryRun()
 
     def setup() {
         buildFile << """
@@ -277,6 +279,7 @@ abstract class AbstractTestFilteringIntegrationTest extends MultiVersionIntegrat
     @Issue("https://github.com/gradle/gradle/issues/1571")
     def "option --tests filter in combined with #includeType"() {
         given:
+        ignoreWhenDryRun()
         buildFile << """
         test {
             $includeConfig
@@ -302,6 +305,7 @@ abstract class AbstractTestFilteringIntegrationTest extends MultiVersionIntegrat
 
     def "invoking testNameIncludePatterns does not influence include/exclude filter"() {
         given:
+        ignoreWhenDryRun()
         buildFile << """
         test {
             include '*ATest*', '*BTest*'
@@ -322,6 +326,7 @@ abstract class AbstractTestFilteringIntegrationTest extends MultiVersionIntegrat
 
     def "invoking filter.includePatterns not disable include/exclude filter"() {
         given:
+        ignoreWhenDryRun()
         buildFile << """
         test {
             include '*ATest*', '*BTest*'
@@ -342,6 +347,7 @@ abstract class AbstractTestFilteringIntegrationTest extends MultiVersionIntegrat
 
     def "can exclude tests"() {
         given:
+        ignoreWhenDryRun()
         buildFile << """
         test {
             filter.excludeTestsMatching("*BTest.test*")
@@ -366,6 +372,10 @@ abstract class AbstractTestFilteringIntegrationTest extends MultiVersionIntegrat
         output.contains('ATest!')
         !output.contains('BTest!')
         output.contains('CTest!')
+    }
+
+    protected ignoreWhenDryRun() {
+        Assume.assumeFalse(isDryRun())
     }
 
     private createTestABC(){

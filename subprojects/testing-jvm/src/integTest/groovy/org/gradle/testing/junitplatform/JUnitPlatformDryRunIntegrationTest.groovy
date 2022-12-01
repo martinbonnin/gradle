@@ -23,8 +23,9 @@ import org.gradle.integtests.fixtures.executer.ExecutionResult
 class JUnitPlatformDryRunIntegrationTest extends JUnitPlatformFilteringIntegrationTest {
 
     @Override
-    protected ExecutionResult run(String... tasks) {
-        return super.run(*tasks, "--test-dry-run")
+    protected ExecutionResult succeeds(String... tasks) {
+        result = executer.withTasks(*tasks, "--test-dry-run").run()
+        return result
     }
 
     def "dry run test is skipping execution and considering as passed in report"() {
