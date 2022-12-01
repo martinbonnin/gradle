@@ -20,10 +20,10 @@ import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
-public class JUnitDryRunner extends Runner {
+public class JUnitTestDryRunner extends Runner {
     private final Runner runner;
 
-    public JUnitDryRunner(Runner runner) {
+    public JUnitTestDryRunner(Runner runner) {
         this.runner = runner;
     }
 

@@ -107,7 +107,7 @@ public class JUnitTestClassExecutor implements Action<String> {
         }
 
         if (options.isDryRun()) {
-            runner = new JUnitDryRunner(runner);
+            runner = new JUnitTestDryRunner(runner);
         }
 
         RunNotifier notifier = new RunNotifier();
