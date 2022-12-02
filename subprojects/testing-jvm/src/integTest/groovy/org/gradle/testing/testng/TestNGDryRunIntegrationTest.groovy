@@ -16,25 +16,24 @@
 
 package org.gradle.testing.testng
 
-import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.DefaultTestExecutionResult
+import org.gradle.integtests.fixtures.TargetVersions
 import org.gradle.integtests.fixtures.TestExecutionResult
+import org.gradle.integtests.fixtures.executer.ExecutionResult
 
-class TestNGDryRunIntegrationTest extends AbstractIntegrationSpec {
+@TargetVersions("6.3.1")
+class TestNGDryRunIntegrationTest extends TestNGFilteringIntegrationTest {
+
+    boolean dryRun = true
+
+    @Override
+    protected ExecutionResult succeeds(String... tasks) {
+        result = executer.withTasks(*tasks, "--test-dry-run").run()
+        return result
+    }
 
     def "dry run test is skipping execution and considering as passed in report"() {
         given:
-        buildFile << """
-        apply plugin: 'java-library'
-        ${mavenCentralRepository()}
-
-        test {
-            useTestNG()
-        }
-        dependencies { testImplementation 'org.testng:testng:6.3.1' }
-        """
-
-        and:
         file("src/test/java/SomeTest.java") << """
         import org.testng.annotations.*;
 

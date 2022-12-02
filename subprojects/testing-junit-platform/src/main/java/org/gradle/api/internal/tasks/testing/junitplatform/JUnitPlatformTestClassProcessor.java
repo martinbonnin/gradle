@@ -39,7 +39,6 @@ import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.LauncherSession;
 import org.junit.platform.launcher.PostDiscoveryFilter;
 import org.junit.platform.launcher.TestExecutionListener;
-import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
 import org.junit.platform.launcher.TestPlan;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
@@ -116,7 +115,7 @@ public class JUnitPlatformTestClassProcessor extends AbstractJUnitTestClassProce
             Launcher launcher = launcherSession.getLauncher();
             if (spec.isDryRun()) {
                 TestPlan testPlan = launcher.discover(discoveryRequest);
-                executeDryRun(testPlan, listener);
+                executeDryRun(testPlan, executionListener);
             } else {
                 launcher.execute(discoveryRequest, executionListener);
             }

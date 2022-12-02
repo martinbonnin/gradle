@@ -70,7 +70,6 @@ public class TestNGSpec implements Serializable {
 
     public TestFilterSpec getFilter() {
         return filter;
-        this.isDryRun = options.isDryRun();
     }
 
     public Set<String> getListeners() {

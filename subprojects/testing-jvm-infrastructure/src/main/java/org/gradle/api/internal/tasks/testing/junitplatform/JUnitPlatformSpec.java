@@ -43,12 +43,11 @@ public class JUnitPlatformSpec implements Serializable {
         this.excludeEngines = excludeEngines;
         this.includeTags = includeTags;
         this.excludeTags = excludeTags;
-        this.isDryRun = isDryRun
+        this.isDryRun = isDryRun;
     }
 
     public TestFilterSpec getFilter() {
         return filter;
-        this.isDryRun = options.isDryRun();
     }
 
     public List<String> getIncludeEngines() {
