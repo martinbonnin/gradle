@@ -49,6 +49,11 @@ import javax.inject.Inject
 import static org.hamcrest.CoreMatchers.containsString
 
 class BuildServiceIntegrationTest extends AbstractIntegrationSpec {
+    def setup() {
+        executer.beforeExecute {
+            withArgument("-Dorg.gradle.configuration-cache.internal.load-after-store=false")
+        }
+    }
 
     def "does not nag when service is used by task without a corresponding usesService call and feature preview is NOT enabled"() {
         given:
@@ -712,6 +717,10 @@ service: closed with value 12
 
     @IgnoreIf({ !GradleContextualExecuter.configCache })
     def "service used at configuration and execution time can be used with configuration cache"() {
+        executer.beforeExecute {
+            withArgument("-Dorg.gradle.configuration-cache.internal.load-after-store=true")
+        }
+
         serviceImplementation()
         buildFile << """
             def provider = gradle.sharedServices.registerIfAbsent("counter", CountingService) {
@@ -731,11 +740,10 @@ service: closed with value 12
         run("count")
 
         then:
-        output.count("service:") == 4
-        outputContains("service: created with value = 10")
-        outputContains("service: value is 11")
-        outputContains("service: value is 12")
-        outputContains("service: closed with value 12")
+        output.count("service:") == 6
+        output.count("service: created with value = 10") == 2
+        output.count("service: value is 11") == 2
+        output.count("service: closed with value 11") == 2
 
         when:
         run("count")

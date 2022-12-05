@@ -83,6 +83,7 @@ task checkDeps {
         succeeds 'checkDeps'
     }
 
+    @ToBeFixedForConfigurationCache(because = "Task uses the Configuration API")
     def "understands project notations"() {
         when:
         settingsFile << "include 'otherProject'"
@@ -120,6 +121,7 @@ task checkDeps {
         succeeds 'checkDeps'
     }
 
+    @ToBeFixedForConfigurationCache(because = "Task uses the Configuration API")
     def "understands client module notation with dependencies"() {
         when:
         buildFile <<  """
@@ -215,6 +217,7 @@ task checkDeps
     }
 
     @Issue("https://issues.gradle.org/browse/GRADLE-3271")
+    @ToBeFixedForConfigurationCache(because = "Task uses the DependencyHandler API")
     def "gradleApi dependency implements contentEquals"() {
         when:
         buildFile << """
@@ -240,6 +243,7 @@ task checkDeps
         succeeds "check"
     }
 
+    @ToBeFixedForConfigurationCache(because = "Task uses the Configuration API")
     def "dependencies block supports provider dependencies"() {
         when:
         buildFile << """

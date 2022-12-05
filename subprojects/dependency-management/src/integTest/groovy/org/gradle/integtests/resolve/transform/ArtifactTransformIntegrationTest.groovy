@@ -1634,6 +1634,7 @@ Found the following transforms:
         outputContains("files: [jar1.jar.txt, jar2.jar.txt]")
     }
 
+    @ToBeFixedForConfigurationCache(because = "exception chain is missing some context when transform input cannot be resolved")
     def "user gets a reasonable error message when a transform throws exception and continues with other inputs"() {
         given:
         buildFile << """
@@ -1682,7 +1683,7 @@ Found the following transforms:
         outputContains("files: [b.jar]")
     }
 
-    @ToBeFixedForConfigurationCache(because = "treating file collection visit failures as a configuration cache problem adds an additional failure to the build summary; exception chain is different when transform input cannot be resolved")
+    @ToBeFixedForConfigurationCache(because = "exception chain is missing some context when transform input cannot be resolved")
     def "user gets a reasonable error message when a transform input cannot be downloaded and proceeds with other inputs"() {
         def m1 = ivyHttpRepo.module("test", "test", "1.3")
             .artifact(type: 'jar', name: 'test-api')
@@ -1772,6 +1773,7 @@ Found the following transforms:
         outputContains("files: [thing1.jar.txt, thing2.jar.txt]")
     }
 
+    @ToBeFixedForConfigurationCache(because = "exception chain is missing some context when transform input cannot be resolved")
     def "user gets a reasonable error message when null is registered via outputs.#method"() {
         given:
         buildFile << """
@@ -1804,6 +1806,7 @@ Found the following transforms:
         method << ['dir', 'file']
     }
 
+    @ToBeFixedForConfigurationCache(because = "exception chain is missing some context when transform input cannot be resolved")
     def "user gets a reasonable error message when transform returns a non-existing file"() {
         given:
         buildFile << """
@@ -1839,6 +1842,7 @@ Found the following transforms:
         outputContains(":resolve NO-SOURCE")
     }
 
+    @ToBeFixedForConfigurationCache(because = "exception chain is missing some context when transform input cannot be resolved")
     def "user gets a reasonable error message when transform registers a #type output via #method"() {
         given:
         buildFile << """
@@ -1990,6 +1994,7 @@ Found the following transforms:
         method << ["file", "dir"]
     }
 
+    @ToBeFixedForConfigurationCache(because = "exception chain is missing some context when transform input cannot be resolved")
     def "user gets a reasonable error message when transform returns a file that is not part of the input artifact or in the output directory"() {
         given:
         buildFile << """
@@ -2022,6 +2027,7 @@ Found the following transforms:
         failure.assertHasCause("Transform output ${testDirectory.file('other.jar')} must be a part of the input artifact or refer to a relative path.")
     }
 
+    @ToBeFixedForConfigurationCache(because = "exception chain is missing some context when transform input cannot be resolved")
     def "user gets a reasonable error message when transform registers an output that is not part of the input artifact or in the output directory"() {
         given:
         buildFile << """
@@ -2062,6 +2068,7 @@ Found the following transforms:
         failure.assertHasCause("Transform output ${testDirectory.file('other.jar')} must be a part of the input artifact or refer to a relative path.")
     }
 
+    @ToBeFixedForConfigurationCache(because = "exception chain is missing some context when transform input cannot be resolved")
     def "user gets a reasonable error message when transform cannot be instantiated"() {
         given:
         buildFile << """

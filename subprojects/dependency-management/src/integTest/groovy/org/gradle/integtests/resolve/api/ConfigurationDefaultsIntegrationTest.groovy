@@ -271,6 +271,7 @@ configurations.conf.incoming.beforeResolve {
         }
     }
 
+    @ToBeFixedForConfigurationCache(because = "Task uses the Configuration API")
     def "fails if beforeResolve used to add dependencies to observed configuration"() {
         resolve.prepare()
         buildFile << """
@@ -343,6 +344,7 @@ task check {
         succeeds ":check"
     }
 
+    @ToBeFixedForConfigurationCache(because = "Task uses the Configuration API")
     def "copied configuration have unique names"() {
         buildFile << """
             configurations {

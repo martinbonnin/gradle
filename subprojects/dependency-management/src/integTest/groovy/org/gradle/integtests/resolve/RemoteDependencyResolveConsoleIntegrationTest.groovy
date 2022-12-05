@@ -19,6 +19,7 @@ package org.gradle.integtests.resolve
 import org.gradle.api.logging.configuration.ConsoleOutput
 import org.gradle.integtests.fixtures.AbstractDependencyResolutionTest
 import org.gradle.integtests.fixtures.RichConsoleStyling
+import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import org.gradle.integtests.fixtures.executer.GradleHandle
 import org.gradle.integtests.fixtures.executer.LogContent
 import org.gradle.test.fixtures.ConcurrentTestUtil
@@ -33,6 +34,7 @@ class RemoteDependencyResolveConsoleIntegrationTest extends AbstractDependencyRe
         server.start()
     }
 
+    @ToBeFixedForConfigurationCache(because = "Expects resolution to happen during task execution")
     def "shows work-in-progress during graph and file resolution"() {
         def m1 = mavenRepo.module("test", "one", "1.2").publish()
         def m2 = mavenRepo.module("test", "two", "1.2").publish()

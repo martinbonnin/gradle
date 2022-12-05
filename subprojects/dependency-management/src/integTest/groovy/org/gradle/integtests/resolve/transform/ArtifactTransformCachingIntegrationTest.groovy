@@ -361,6 +361,7 @@ class ArtifactTransformCachingIntegrationTest extends AbstractHttpDependencyReso
 
     // This shows current behaviour, where the transform is executed even though the input artifact has not been created yet
     // This should become an error eventually
+    @ToBeFixedForConfigurationCache(because = "Transform is run twice")
     def "executes transform immediately when required during task graph building"() {
         buildFile << declareAttributes() << withJarTasks() << """
             import org.gradle.api.artifacts.transform.TransformParameters
@@ -855,6 +856,7 @@ class ArtifactTransformCachingIntegrationTest extends AbstractHttpDependencyReso
         output.count("Transformed") == 0
     }
 
+    @ToBeFixedForConfigurationCache(because = "Context is lost from exception")
     def "transform is run again and old output is removed after it failed in previous build"() {
         given:
         buildFile << declareAttributes() << multiProjectWithJarSizeTransform() << withJarTasks() << withFileLibDependency("lib3.jar") << withExternalLibDependency("lib4")
@@ -1076,6 +1078,7 @@ class ArtifactTransformCachingIntegrationTest extends AbstractHttpDependencyReso
         output.count("files: [${(1..3).collectMany { (["lib${it}.jar00"] * 3) + (["lib${it}.jar10"] * 3) }.join(", ")}, ${((["lib4-1.0.jar00"] * 3) + (["lib4-1.0.jar10"] * 3)).join(", ")}]") == 2
     }
 
+    @ToBeFixedForConfigurationCache(because = "Context is lost from exception")
     def "failure in transformation chain propagates (position in chain: #failingTransform)"() {
         given:
 

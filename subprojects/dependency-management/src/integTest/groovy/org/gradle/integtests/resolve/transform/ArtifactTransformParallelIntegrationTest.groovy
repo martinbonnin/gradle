@@ -17,6 +17,7 @@
 package org.gradle.integtests.resolve.transform
 
 import org.gradle.integtests.fixtures.AbstractDependencyResolutionTest
+import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import org.gradle.integtests.fixtures.build.BuildTestFile
 import org.gradle.test.fixtures.server.http.BlockingHttpServer
 import org.junit.Rule
@@ -91,6 +92,7 @@ class ArtifactTransformParallelIntegrationTest extends AbstractDependencyResolut
         }
     }
 
+    @ToBeFixedForConfigurationCache(because = "https://github.com/gradle/gradle/issues/13566")
     def "transformations are applied in parallel for each external dependency artifact"() {
         def m1 = mavenRepo.module("test", "test", "1.3").publish()
         m1.artifactFile.text = "1234"
@@ -179,6 +181,7 @@ class ArtifactTransformParallelIntegrationTest extends AbstractDependencyResolut
         outputContains("Transforming lib3.jar to lib3.jar.txt")
     }
 
+    @ToBeFixedForConfigurationCache(because = "https://github.com/gradle/gradle/issues/13566")
     def "transformations are applied in parallel for each file dependency artifact"() {
         given:
         buildFile << """
@@ -216,6 +219,7 @@ class ArtifactTransformParallelIntegrationTest extends AbstractDependencyResolut
         outputContains("Transforming c.jar to c.jar.txt")
     }
 
+    @ToBeFixedForConfigurationCache(because = "https://github.com/gradle/gradle/issues/13566")
     def "transformations are applied in parallel for a mix of external and file dependency artifacts"() {
         def m1 = mavenRepo.module("test", "test", "1.3").publish()
         m1.artifactFile.text = "1234"
@@ -266,6 +270,7 @@ class ArtifactTransformParallelIntegrationTest extends AbstractDependencyResolut
         outputContains("Transforming b.jar to b.jar.txt")
     }
 
+    @ToBeFixedForConfigurationCache(because = "https://github.com/gradle/gradle/issues/13566")
     def "files are transformed as soon as they are downloaded"() {
         def m1 = mavenRepo.module("test", "test", "1.3").publish()
         m1.artifactFile.text = "1234"
@@ -335,6 +340,7 @@ class ArtifactTransformParallelIntegrationTest extends AbstractDependencyResolut
         outputContains("Transforming b.jar to b.jar.txt")
     }
 
+    @ToBeFixedForConfigurationCache(because = "https://github.com/gradle/gradle/issues/13566")
     def "failures are collected from transformations applied parallel"() {
         given:
         buildFile << """

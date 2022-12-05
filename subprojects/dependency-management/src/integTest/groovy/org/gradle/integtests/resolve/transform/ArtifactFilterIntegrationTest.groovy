@@ -17,6 +17,7 @@
 package org.gradle.integtests.resolve.transform
 
 import org.gradle.integtests.fixtures.AbstractHttpDependencyResolutionTest
+import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 
 class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest {
     def setup() {
@@ -32,7 +33,7 @@ class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest
             repositories {
                 maven { url "${mavenRepo.uri}" }
             }
-            
+
             project(':libInclude') {
                 configurations.create('default')
                 task jar {}
@@ -55,6 +56,7 @@ class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest
 """
     }
 
+    @ToBeFixedForConfigurationCache(because = "Task uses the Configuration API")
     def "can filter artifacts based on component id"() {
         given:
         buildFile << """
@@ -71,7 +73,7 @@ class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest
                 assert component instanceof ModuleComponentIdentifier
                 return component.group == 'org.include'
             }
-            
+
             task check {
                 doLast {
                     def all = ['included-1.3.jar', 'excluded-2.3.jar', 'libInclude.jar', 'libExclude.jar']
@@ -106,7 +108,7 @@ class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest
             }
             def filteredView = configurations.compile.incoming.artifactView({componentFilter(artifactFilter)}).files
             def unfilteredView = configurations.compile.incoming.artifactView({componentFilter({ true })}).files
-            
+
             task checkFiltered {
                 inputs.files(filteredView)
                 doLast {
@@ -147,7 +149,7 @@ class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest
             }
             def artifactFilter = { component -> component instanceof ModuleComponentIdentifier}
             def filteredView = configurations.compile.incoming.artifactView{componentFilter(artifactFilter)}.files
-            
+
             task checkFiltered {
                 inputs.files(filteredView)
                 doLast {
@@ -175,7 +177,7 @@ class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest
             }
             def artifactFilter = { component -> component instanceof ProjectComponentIdentifier}
             def filteredView = configurations.compile.incoming.artifactView{componentFilter(artifactFilter)}.files
-            
+
             task checkFiltered {
                 inputs.files(filteredView)
                 doLast {
@@ -198,13 +200,13 @@ class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest
             dependencies {
                 compile files("internalLocalLibExclude.jar")
             }
-            
-            def artifactFilter = { component -> 
+
+            def artifactFilter = { component ->
                 println "filter applied to " + component
-                false 
+                false
             }
             def filteredView = configurations.compile.incoming.artifactView{componentFilter(artifactFilter)}.files
-            
+
             task checkFiltered {
                 inputs.files(filteredView)
                 doLast {
@@ -237,7 +239,7 @@ class ArtifactFilterIntegrationTest extends AbstractHttpDependencyResolutionTest
             dependencies {
                 compile project('libInclude')
                 compile project('libExclude')
-                
+
                 registerTransform(Jar2Class) {
                     from.attribute(Attribute.of('artifactType', String), "jar")
                     to.attribute(Attribute.of('artifactType', String), "class")

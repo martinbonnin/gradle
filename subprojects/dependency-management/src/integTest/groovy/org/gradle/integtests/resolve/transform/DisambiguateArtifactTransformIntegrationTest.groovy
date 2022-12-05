@@ -17,6 +17,7 @@
 package org.gradle.integtests.resolve.transform
 
 import org.gradle.integtests.fixtures.AbstractHttpDependencyResolutionTest
+import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import spock.lang.Issue
 
 class DisambiguateArtifactTransformIntegrationTest extends AbstractHttpDependencyResolutionTest {
@@ -241,6 +242,7 @@ ${artifactTransform("TestTransform")}
         failureCauseContains('Found multiple transforms')
     }
 
+    @ToBeFixedForConfigurationCache(because = "Incorrect transform is selected")
     def "transform with two attributes will not confuse"() {
         given:
         buildFile << """

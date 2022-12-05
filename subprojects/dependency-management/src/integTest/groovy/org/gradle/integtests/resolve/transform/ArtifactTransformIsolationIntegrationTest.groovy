@@ -17,8 +17,7 @@
 package org.gradle.integtests.resolve.transform
 
 import org.gradle.integtests.fixtures.AbstractHttpDependencyResolutionTest
-import org.gradle.integtests.fixtures.executer.GradleContextualExecuter
-import spock.lang.IgnoreIf
+import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 
 /**
  * Ensures that artifact transform parameters are isolated from one another and the surrounding project state.
@@ -74,7 +73,7 @@ class Resolve extends Copy {
 """
     }
 
-    @IgnoreIf({ GradleContextualExecuter.parallel })
+    @ToBeFixedForConfigurationCache(because = "incorrect transform is selected")
     def "serialized mutable class is isolated during artifact transformation"() {
         mavenRepo.module("test", "test", "1.3").publish()
         mavenRepo.module("test", "test2", "2.3").publish()

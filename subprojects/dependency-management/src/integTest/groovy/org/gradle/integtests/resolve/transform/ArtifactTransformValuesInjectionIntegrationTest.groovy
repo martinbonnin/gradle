@@ -41,6 +41,7 @@ import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.UntrackedTask
 import org.gradle.api.tasks.options.OptionValues
 import org.gradle.integtests.fixtures.AbstractDependencyResolutionTest
+import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import org.gradle.internal.reflect.Instantiator
 import org.gradle.internal.reflect.problems.ValidationProblemId
 import org.gradle.internal.reflect.validation.ValidationMessageChecker
@@ -353,6 +354,7 @@ class ArtifactTransformValuesInjectionIntegrationTest extends AbstractDependency
         ValidationProblemId.MISSING_ANNOTATION,
         ValidationProblemId.INCOMPATIBLE_ANNOTATIONS
     ])
+    @ToBeFixedForConfigurationCache(because = "Context is lost from exception")
     def "transform parameters are validated for input output annotations"() {
         settingsFile << """
             include 'a', 'b'
@@ -458,6 +460,7 @@ class ArtifactTransformValuesInjectionIntegrationTest extends AbstractDependency
         )
     }
 
+    @ToBeFixedForConfigurationCache(because = "Context is lost from exception")
     def "cannot query parameters for transform without parameters"() {
         settingsFile << """
             include 'a', 'b', 'c'
@@ -489,6 +492,7 @@ class ArtifactTransformValuesInjectionIntegrationTest extends AbstractDependency
     @ValidationTestFor(
         ValidationProblemId.INVALID_USE_OF_TYPE_ANNOTATION
     )
+    @ToBeFixedForConfigurationCache(because = "Context is lost from exception")
     def "transform parameters type cannot use caching annotations"() {
         settingsFile << """
             include 'a', 'b'
@@ -539,6 +543,7 @@ class ArtifactTransformValuesInjectionIntegrationTest extends AbstractDependency
     @ValidationTestFor(
         ValidationProblemId.ANNOTATION_INVALID_IN_CONTEXT
     )
+    @ToBeFixedForConfigurationCache(because = "Context is lost from exception")
     def "transform parameters type cannot use annotation @#ann.simpleName"() {
         settingsFile << """
             include 'a', 'b'

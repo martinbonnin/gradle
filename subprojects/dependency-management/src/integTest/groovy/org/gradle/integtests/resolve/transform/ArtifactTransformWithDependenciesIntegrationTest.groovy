@@ -33,7 +33,6 @@ import spock.lang.Issue
 import javax.annotation.Nonnull
 import java.util.regex.Pattern
 
-@IgnoreIf({ GradleContextualExecuter.parallel })
 class ArtifactTransformWithDependenciesIntegrationTest extends AbstractHttpDependencyResolutionTest implements ArtifactTransformTestFixture {
 
     def setup() {
@@ -271,6 +270,7 @@ allprojects {
 """
     }
 
+    @IgnoreIf({ GradleContextualExecuter.parallel })
     def "transform can access artifact dependencies as a set of files when using ArtifactView"() {
         given:
         setupBuildWithSingleStep()
@@ -285,6 +285,7 @@ allprojects {
         output.contains('Single step transform received dependencies files [hamcrest-core-1.3.jar] for processing junit-4.11.jar')
     }
 
+    @IgnoreIf({ GradleContextualExecuter.parallel })
     def "transform can access file dependencies as a set of files when using ArtifactView"() {
         given:
         setupBuildWithSingleStep()
@@ -305,6 +306,7 @@ project(':common') {
         output.contains('Single step transform received dependencies files [] for processing otherLib.jar')
     }
 
+    @IgnoreIf({ GradleContextualExecuter.parallel })
     def "transform can access artifact dependencies as a set of files when using ArtifactView, even if first step did not use dependencies"() {
         given:
         setupBuildWithFirstStepThatDoesNotUseDependencies()
@@ -328,6 +330,7 @@ project(':common') {
         )
     }
 
+    @IgnoreIf({ GradleContextualExecuter.parallel })
     def "transform can access artifact dependencies, in previous transform step, as set of files when using ArtifactView"() {
         given:
         setupBuildWithTwoSteps()
@@ -1336,6 +1339,7 @@ abstract class ClasspathTransform implements TransformAction<TransformParameters
         )
     }
 
+    @ToBeFixedForConfigurationCache(because = "Context is lost from exception")
     def "transform does not execute when dependencies cannot be transformed"() {
         given:
         setupBuildWithFirstStepThatDoesNotUseDependencies()
