@@ -617,6 +617,15 @@ public class AvailableToolChains {
         }
 
         @Override
+        public boolean meets(ToolChainRequirement requirement) {
+            // https://github.com/gradle/gradle-private/issues/3654
+            if (requirement == ToolChainRequirement.SUPPORTS_32 || requirement == ToolChainRequirement.SUPPORTS_32_AND_64) {
+                return false;
+            }
+            return super.meets(requirement);
+        }
+
+        @Override
         public String platformSpecificToolChainConfiguration() {
             String config = "     eachPlatform { platformToolChain ->\n";
             config += "         if (platformToolChain.platform.architecture.isI386() || platformToolChain.platform.architecture.isArm()) {\n";
