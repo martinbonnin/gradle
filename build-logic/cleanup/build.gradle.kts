@@ -9,3 +9,9 @@ dependencies {
     implementation(project(":basics"))
     implementation(project(":module-identity"))
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    doFirst {
+        println("$name vendor is ${javaCompiler.get().metadata.vendor}")
+    }
+}
