@@ -219,13 +219,7 @@ public class AvailableToolChains {
         // Search in the standard installation locations and construct
         File compiler64Exe = new File("C:/cygwin64/bin/g++.exe");
         if (compiler64Exe.isFile()) {
-            File compiler32Exe = new File("C:/cygwin64/bin/i686-pc-cygwin-gcc.exe");
-            if (compiler32Exe.isFile()) {
-                File cygwin32RuntimePath = new File(compiler32Exe.getParentFile().getParentFile(), "usr/i686-pc-cygwin/sys-root/usr/bin");
-                return new InstalledCygwinGcc(VersionNumber.UNKNOWN).inPath(compiler64Exe.getParentFile(), cygwin32RuntimePath);
-            } else {
-                return new UnavailableToolChain(ToolFamily.CYGWIN_GCC);
-            }
+            return new InstalledCygwinGcc(VersionNumber.UNKNOWN).inPath(compiler64Exe.getParentFile());
         }
 
         return new UnavailableToolChain(ToolFamily.CYGWIN_GCC);
@@ -624,20 +618,6 @@ public class AvailableToolChains {
                 return false;
             }
             return super.meets(requirement);
-        }
-
-        @Override
-        public String platformSpecificToolChainConfiguration() {
-            String config = "     eachPlatform { platformToolChain ->\n";
-            config += "         if (platformToolChain.platform.architecture.isI386() || platformToolChain.platform.architecture.isArm()) {\n";
-            config += "             platformToolChain.cCompiler.executable='i686-pc-cygwin-gcc.exe'\n";
-            config += "             platformToolChain.cppCompiler.executable='i686-pc-cygwin-g++.exe'\n";
-            config += "             platformToolChain.linker.executable='i686-pc-cygwin-g++.exe'\n";
-            config += "             platformToolChain.assembler.executable='i686-pc-cygwin-gcc.exe'\n";
-            config += "             platformToolChain.staticLibArchiver.executable='i686-pc-cygwin-ar.exe'\n";
-            config += "         }\n";
-            config += "     }\n";
-            return config;
         }
 
         @Override
