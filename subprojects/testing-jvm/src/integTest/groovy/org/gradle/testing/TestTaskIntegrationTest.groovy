@@ -22,7 +22,7 @@ import org.gradle.test.fixtures.file.TestFile
 import org.gradle.testing.fixture.JUnitCoverage
 import org.gradle.testing.fixture.JUnitMultiVersionIntegrationSpec
 import org.gradle.util.Requires
-import org.gradle.util.TestPrecondition
+import org.gradle.util.UnitTestPreconditions
 import spock.lang.Issue
 
 import static org.gradle.testing.fixture.JUnitCoverage.JUNIT_4_LATEST
@@ -58,7 +58,7 @@ class TestTaskIntegrationTest extends JUnitMultiVersionIntegrationSpec {
         result.assertTaskSkipped(":test")
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "compiles and executes a Java 9 test suite"() {
         given:
         buildFile << java9Build()
@@ -76,7 +76,7 @@ class TestTaskIntegrationTest extends JUnitMultiVersionIntegrationSpec {
 
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "compiles and executes a Java 9 test suite even if a module descriptor is on classpath"() {
         given:
         buildFile << java9Build()
@@ -133,7 +133,7 @@ class TestTaskIntegrationTest extends JUnitMultiVersionIntegrationSpec {
         Runtime.runtime.availableProcessors() + 1 | _
     }
 
-    @Requires(TestPrecondition.ONLINE)
+    @Requires(UnitTestPreconditions.Online)
     def "re-runs tests when resources are renamed in a jar"() {
         buildFile << """
             allprojects {
@@ -175,7 +175,7 @@ class TestTaskIntegrationTest extends JUnitMultiVersionIntegrationSpec {
         fails 'test'
     }
 
-    @Requires(TestPrecondition.ONLINE)
+    @Requires(UnitTestPreconditions.Online)
     def "re-runs tests when resources are renamed"() {
         buildFile << """
             apply plugin: 'java'

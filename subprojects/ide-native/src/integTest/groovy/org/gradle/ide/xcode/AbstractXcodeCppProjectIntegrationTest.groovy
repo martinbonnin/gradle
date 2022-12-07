@@ -19,7 +19,7 @@ package org.gradle.ide.xcode
 import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import org.gradle.nativeplatform.fixtures.app.CppSourceElement
 import org.gradle.util.Requires
-import org.gradle.util.TestPrecondition
+import org.gradle.util.UnitTestPreconditions
 
 abstract class AbstractXcodeCppProjectIntegrationTest extends AbstractXcodeNativeProjectIntegrationTest {
     @Override

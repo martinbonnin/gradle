@@ -22,7 +22,7 @@ import org.gradle.integtests.fixtures.executer.GradleContextualExecuter
 import org.gradle.integtests.fixtures.jvm.JDWPUtil
 import org.gradle.test.fixtures.ConcurrentTestUtil
 import org.gradle.util.Requires
-import org.gradle.util.TestPrecondition
+import org.gradle.util.UnitTestPreconditions
 import org.junit.Assume
 import spock.lang.IgnoreIf
 import spock.lang.Issue
@@ -131,7 +131,7 @@ class CommandLineIntegrationSpec extends AbstractIntegrationSpec {
         jdwpClient.close()
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "can debug on explicitly any host"() {
         given:
         executer.requireDaemon().requireIsolatedDaemons()

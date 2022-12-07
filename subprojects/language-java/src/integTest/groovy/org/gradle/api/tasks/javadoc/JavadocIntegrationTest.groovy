@@ -21,7 +21,7 @@ import org.gradle.integtests.fixtures.AvailableJavaHomes
 import org.gradle.integtests.fixtures.TestResources
 import org.gradle.test.fixtures.file.TestFile
 import org.gradle.util.Requires
-import org.gradle.util.TestPrecondition
+import org.gradle.util.UnitTestPreconditions
 import org.gradle.util.internal.TextUtil
 import org.junit.Rule
 import spock.lang.Issue
@@ -32,7 +32,7 @@ class JavadocIntegrationTest extends AbstractIntegrationSpec {
     @Rule TestResources testResources = new TestResources(temporaryFolder)
 
     @Issue("GRADLE-1563")
-    @Requires(TestPrecondition.JDK8_OR_EARLIER)  // JDK 9 requires an @Deprecated annotation that breaks this same test on Java 7 on Windows.
+    @Requires(UnitTestPreconditions.Jdk8OrEarlier)  // JDK 9 requires an @Deprecated annotation that breaks this same test on Java 7 on Windows.
     def handlesTagsAndTaglets() {
         when:
         run("javadoc")
@@ -45,7 +45,7 @@ class JavadocIntegrationTest extends AbstractIntegrationSpec {
     }
 
     @Issue(["GRADLE-2520", "https://github.com/gradle/gradle/issues/4993"])
-    @Requires(TestPrecondition.JDK9_OR_EARLIER)
+    @Requires(UnitTestPreconditions.Jdk9OrEarlier)
     def canCombineLocalOptionWithOtherOptions() {
         when:
         run("javadoc")
@@ -334,7 +334,7 @@ Joe!""")
         executedAndNotSkipped(":javadoc")
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     @Issue("https://github.com/gradle/gradle/issues/4841")
     def "adding custom javadoc options makes task out-of-date with html5 option"() {
         given: "a javadoc task without custom options"
@@ -371,7 +371,7 @@ Joe!""")
         executedAndNotSkipped(":javadoc")
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     @Issue("https://github.com/gradle/gradle/issues/4841")
     def "changing the value of a custom javadoc options makes task out-of-date"() {
         given: "a javadoc task with a custom options"
@@ -409,7 +409,7 @@ Joe!""")
         executedAndNotSkipped(":javadoc")
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     @Issue("https://github.com/gradle/gradle/issues/4841")
     def "changing which custom javadoc options are available makes task out-of-date"() {
         given: "a javadoc task with a custom options"
@@ -447,7 +447,7 @@ Joe!""")
         executedAndNotSkipped(":javadoc")
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     @Issue("https://github.com/gradle/gradle/issues/4841")
     def "unchanged custom javadoc option does not make task out-of-date"() {
         given: "a javadoc task with a custom options"
@@ -476,7 +476,7 @@ Joe!""")
     }
 
     // bootclasspath has been removed in Java 9+
-    @Requires(TestPrecondition.JDK8_OR_EARLIER)
+    @Requires(UnitTestPreconditions.Jdk8OrEarlier)
     @Issue("https://github.com/gradle/gradle/issues/19817")
     def "shows deprecation if bootclasspath is provided as a path instead of a single file"() {
         def jre = AvailableJavaHomes.getBestJre()

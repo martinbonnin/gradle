@@ -23,7 +23,7 @@ import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.AvailableJavaHomes
 import org.gradle.test.fixtures.file.ClassFile
 import org.gradle.util.Requires
-import org.gradle.util.TestPrecondition
+import org.gradle.util.UnitTestPreconditions
 
 abstract class BasicJavaCompilerIntegrationSpec extends AbstractIntegrationSpec {
 
@@ -214,7 +214,7 @@ compileJava {
 """
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "compile with release flag using #notation notation"() {
         given:
         goodCode()
@@ -243,7 +243,7 @@ compileJava {
         ]
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "compile with release property set"() {
         given:
         goodCode()
@@ -266,7 +266,7 @@ compileJava {
         bytecodeVersion() == 52
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "fails to compile with release property and flag set"() {
         given:
         goodCode()
@@ -280,7 +280,7 @@ compileJava.options.release.set(8)
         failureHasCause('Cannot specify --release via `CompileOptions.compilerArgs` when using `JavaCompile.release`.')
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "compile with release property and autoTargetJvmDisabled"() {
         given:
         goodCode()
@@ -349,7 +349,7 @@ compileJava {
         bytecodeVersion() == 52
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "compile fails when using newer API with release option"() {
         given:
         file("src/main/java/compile/test/FailsOnJava8.java") << '''
@@ -376,7 +376,7 @@ compileJava.options.compilerArgs.addAll(['--release', '8'])
         failure.assertHasErrorOutput("method takeWhile")
     }
 
-    @Requires(TestPrecondition.JDK9_OR_LATER)
+    @Requires(UnitTestPreconditions.Jdk9OrLater)
     def "compile fails when using newer API with release property"() {
         given:
         file("src/main/java/compile/test/FailsOnJava8.java") << '''

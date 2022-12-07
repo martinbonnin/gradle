@@ -29,7 +29,7 @@ import org.gradle.internal.os.OperatingSystem
 import org.gradle.util.internal.RedirectStdOutAndErr
 import org.gradle.util.Requires
 import org.gradle.util.SetSystemProperties
-import org.gradle.util.TestPrecondition
+import org.gradle.util.UnitTestPreconditions
 
 class ToolingApiClassLoaderProvider {
     private static final Map<String, ClassLoader> TEST_CLASS_LOADERS = [:]
