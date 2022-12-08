@@ -359,7 +359,7 @@ fun compilerConfigurationFor(messageCollector: MessageCollector, jvmTarget: Java
         put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
         put(JVM_TARGET, jvmTarget.toKotlinJvmTarget())
         put(JDK_HOME, File(System.getProperty("java.home")))
-        put(IR, false)
+        put(IR, true)
         put(SAM_CONVERSIONS, JvmClosureGenerationScheme.CLASS)
         addJvmSdkRoots(PathUtil.getJdkClassesRootsFromCurrentJre())
         put(CommonConfigurationKeys.LANGUAGE_VERSION_SETTINGS, gradleKotlinDslLanguageVersionSettings)
