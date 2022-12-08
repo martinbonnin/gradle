@@ -21,11 +21,11 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.internal.artifacts.DependencyResolutionServices
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.integtests.fixtures.RepoScriptBlockUtil
-import org.gradle.integtests.fixtures.executer.IntegrationTestBuildContext
 import org.gradle.integtests.fixtures.executer.CommitDistribution
+import org.gradle.integtests.fixtures.executer.IntegrationTestBuildContext
+import org.gradle.internal.exceptions.DefaultMultiCauseException
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testfixtures.internal.ProjectBuilderImpl
-
 
 class ToolingApiDistributionResolver {
 
@@ -96,7 +96,16 @@ class ToolingApiDistributionResolver {
         Dependency dep = resolutionServices.dependencyHandler.create(dependency)
         Configuration config = resolutionServices.configurationContainer.detachedConfiguration(dep)
         config.resolutionStrategy.disableDependencyVerification()
-        return config.files
+        int retryCount = 3
+        List<Throwable> exceptions = []
+        while (retryCount-- > 0) {
+            try {
+                return config.files
+            } catch (Throwable t) {
+                exceptions.add(t)
+            }
+        }
+        throw new DefaultMultiCauseException("Failed to resolve $dependency", exceptions)
     }
 
     private boolean useToolingApiFromTestClasspath(String toolingApiVersion) {
