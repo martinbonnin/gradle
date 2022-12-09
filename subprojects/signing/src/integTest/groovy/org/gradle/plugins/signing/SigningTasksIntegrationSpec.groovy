@@ -85,7 +85,7 @@ class SigningTasksIntegrationSpec extends SigningIntegrationSpec {
         skipped(":signJar", ":signJavadocJar", ":signSourcesJar")
     }
 
-    @Requires(adhoc = { GpgCmdFixture.getAvailableGpg() != null })
+    @Requires(SigningTestPreconditions.GpgAvailable)
     @ToBeFixedForConfigurationCache
     def "out-of-date when signatory changes"() {
         given:

@@ -24,6 +24,7 @@ import org.gradle.integtests.fixtures.jvm.JavaToolchainFixture
 import org.gradle.internal.jvm.Jvm
 import org.gradle.test.fixtures.file.TestFile
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.util.IntegTestPreconditions
 import org.gradle.util.Requires
 import org.gradle.util.UnitTestPreconditions
 import org.gradle.util.internal.TextUtil
@@ -334,7 +335,7 @@ class JavaCompileToolchainIntegrationTest extends AbstractIntegrationSpec implem
         failureHasCause('No compatible toolchains found for request specification: {languageVersion=99, vendor=any, implementation=vendor-specific} (auto-detect true, auto-download false)')
     }
 
-    @Requires(adhoc = { AvailableJavaHomes.getJdk(JavaVersion.VERSION_1_7) != null })
+    @Requires(IntegTestPreconditions.Java7HomeAvailable)
     def "can use toolchains to compile java 1.7 code"() {
         def jdk = AvailableJavaHomes.getJdk(JavaVersion.VERSION_1_7)
         buildFile << """
