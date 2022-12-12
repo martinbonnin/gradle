@@ -26,6 +26,7 @@ import org.gradle.internal.classloader.FilteringClassLoader
 import org.gradle.internal.classloader.MultiParentClassLoader
 import org.gradle.internal.classloader.VisitableURLClassLoader
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.util.TestPrecondition
 import org.gradle.util.internal.RedirectStdOutAndErr
 import org.gradle.util.Requires
 import org.gradle.util.SetSystemProperties
