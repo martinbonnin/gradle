@@ -203,10 +203,15 @@ public class DefaultPersistentDirectoryStore implements ReferencablePersistentCa
         cacheAccess.useCache(action);
     }
 
+    @Override
+    public void cleanup() {
+        cacheAccess.cleanup();
+    }
+
     private class Cleanup implements CacheCleanupAction {
         @Override
         public boolean requiresCleanup() {
-            if (cacheCleanup != null) {
+            if (dir.exists() && cacheCleanup != null) {
                 if (!gcFile.exists()) {
                     GFileUtils.touch(gcFile);
                 } else {
