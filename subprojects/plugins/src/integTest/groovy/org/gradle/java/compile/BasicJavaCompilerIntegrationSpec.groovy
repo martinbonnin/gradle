@@ -22,6 +22,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.AvailableJavaHomes
 import org.gradle.test.fixtures.file.ClassFile
+import org.gradle.util.IntegTestPreconditions
 import org.gradle.util.Requires
 import org.gradle.util.UnitTestPreconditions
 
@@ -149,7 +150,7 @@ public class FxApp extends Application {
         succeeds("compileJava")
     }
 
-    @Requires(adhoc = { AvailableJavaHomes.getJdk(JavaVersion.VERSION_11) != null })
+    @Requires(IntegTestPreconditions.Java11HomeAvailable)
     def 'ignores project level compatibility when using toolchain'() {
         given:
         goodCode()
@@ -171,7 +172,7 @@ compileJava {
 """
     }
 
-    @Requires(adhoc = { AvailableJavaHomes.getJdk(JavaVersion.VERSION_11) != null })
+    @Requires(IntegTestPreconditions.Java11HomeAvailable)
     def 'honors task level compatibility when using toolchain'() {
         given:
         goodCode()
@@ -194,7 +195,7 @@ compileJava {
 """
     }
 
-    @Requires(adhoc = { AvailableJavaHomes.getJdk(JavaVersion.VERSION_14) != null })
+    @Requires(IntegTestPreconditions.Java14HomeAvailable)
     def 'computes target jvm version when using toolchain'() {
         given:
         goodCode()
