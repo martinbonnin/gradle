@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package org.gradle.cache.internal;
+package org.gradle.api.internal.project;
 
-public interface CacheCleanupAction {
+/**
+ * A service can implement this interface to indicate that it holds mutable project scoped state that should be discarded when
+ * projects are discarded.
+ */
+public interface HoldsProjectState {
     /**
-     * Determines if this action should run. Called when the cache is closed, holding an exclusive lock.
+     * Discards any project state.
      */
-    boolean requiresCleanup();
-
-    /**
-     * Executes the action to cleanup the cache. Called only if {@link #requiresCleanup()} returns true, holding an exclusive lock.
-     * The lock is not released between calling {@link #requiresCleanup()} and this method.
-     */
-    void cleanup();
+    void discardAll();
 }
