@@ -48,8 +48,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.WillCloseWhenClosed;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -123,26 +121,23 @@ public class JUnitPlatformTestClassProcessor extends AbstractJUnitTestClassProce
     }
 
     private void executeDryRun(TestPlan testPlan, TestExecutionListener listener) {
-        List<TestIdentifier> testIdentifiers = new LinkedList<>();
-
-        for (TestIdentifier root : testPlan.getRoots()) {
-            testIdentifiers.add(root);
-            testIdentifiers.addAll(testPlan.getDescendants(root));
-        }
-
         listener.testPlanExecutionStarted(testPlan);
 
-        for (TestIdentifier identifier : testIdentifiers) {
-            listener.executionStarted(identifier);
-        }
-
-        Collections.reverse(testIdentifiers);
-
-        for (TestIdentifier identifier : testIdentifiers) {
-            listener.executionFinished(identifier, TestExecutionResult.successful());
+        for (TestIdentifier root : testPlan.getRoots()) {
+            dryRun(root, testPlan, listener);
         }
 
         listener.testPlanExecutionFinished(testPlan);
+    }
+
+    private void dryRun(TestIdentifier testIdentifier, TestPlan testPlan, TestExecutionListener listener) {
+        listener.executionStarted(testIdentifier);
+
+        for (TestIdentifier child : testPlan.getChildren(testIdentifier)) {
+            dryRun(child, testPlan, listener);
+        }
+
+        listener.executionFinished(testIdentifier, TestExecutionResult.successful());
     }
 
     /**
