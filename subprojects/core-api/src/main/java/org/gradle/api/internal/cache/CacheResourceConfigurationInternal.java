@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package org.gradle.launcher.daemon.server.health;
+package org.gradle.api.internal.cache;
 
-import org.gradle.api.logging.Logger;
+import org.gradle.api.cache.CacheResourceConfiguration;
 
-public class HealthLogger {
+import java.util.function.Supplier;
 
-    static final String HEALTH_MESSAGE_PROPERTY = "org.gradle.daemon.performance.logging";
-
-    public void logHealth(DaemonHealthStats stats, Logger logger) {
-        if (Boolean.getBoolean(HEALTH_MESSAGE_PROPERTY)) {
-            logger.lifecycle(stats.getHealthInfo());
-        } else {
-            //the default
-            logger.info(stats.getHealthInfo());
-        }
-    }
+public interface CacheResourceConfigurationInternal extends CacheResourceConfiguration {
+    Supplier<Long> getRemoveUnusedEntriesOlderThanAsSupplier();
 }
