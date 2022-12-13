@@ -21,7 +21,6 @@ import org.gradle.integtests.fixtures.RequiredFeature
 import org.gradle.test.fixtures.plugin.PluginBuilder
 import org.gradle.test.fixtures.server.http.MavenHttpPluginRepository
 import org.gradle.util.GradleVersion
-import org.gradle.util.UnitTestPreconditions
 import org.gradle.util.internal.ToBeImplemented
 import spock.lang.IgnoreIf
 import spock.lang.Issue
