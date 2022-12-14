@@ -13,7 +13,7 @@ class GradleBuildToolRootProject(branch: VersionedSettingsBranch) : Project({
     buildType(BuildType({
         this.name = "Cli Test"
         this.description = "Cli Test"
-        this.id("cli-test")
+        this.id("cli_test")
 
         applyDefaultSettings(Os.LINUX)
         steps {
