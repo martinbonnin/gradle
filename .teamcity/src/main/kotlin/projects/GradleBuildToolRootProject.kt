@@ -1,26 +1,24 @@
 package projects
 
+import common.Os
 import common.VersionedSettingsBranch
+import common.applyDefaultSettings
+import common.gradleWrapper
+import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
-import model.CIBuildModel
-import model.DefaultFunctionalTestBucketProvider
-import model.JsonBasedGradleSubprojectProvider
-import promotion.PromotionProject
-import util.UtilPerformanceProject
-import util.UtilProject
-import java.io.File
 
 class GradleBuildToolRootProject(branch: VersionedSettingsBranch) : Project({
-    val model = CIBuildModel(
-        projectId = "Check",
-        branch = branch,
-        buildScanTags = listOf("Check"),
-        subprojects = JsonBasedGradleSubprojectProvider(File("./subprojects.json"))
-    )
-    val gradleBuildBucketProvider = DefaultFunctionalTestBucketProvider(model, File("./test-buckets.json"))
-    subProject(CheckProject(model, gradleBuildBucketProvider))
+    buildType(BuildType({
+        this.name = "Cli Test"
+        this.description = "Cli Test"
+        this.id("cli-test")
 
-    subProject(PromotionProject(model.branch))
-    subProject(UtilProject)
-    subProject(UtilPerformanceProject)
+        applyDefaultSettings(Os.LINUX)
+        steps {
+            gradleWrapper(this@BuildType) {
+                name = "GRADLE_RUNNER"
+                tasks = "clean cli:test"
+            }
+        }
+    }))
 })

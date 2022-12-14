@@ -120,10 +120,6 @@ fun BuildType.applyDefaultSettings(os: Os = Os.LINUX, arch: Arch = Arch.AMD64, b
         branchFilter = branchesFilterExcluding()
     }
 
-    features {
-        enablePullRequestFeature()
-    }
-
     requirements {
         requiresOs(os)
         requiresArch(os, arch)
@@ -150,16 +146,7 @@ fun javaHome(jvm: Jvm, os: Os, arch: Arch = Arch.AMD64) = "%${os.name.lowercase(
 
 fun BuildType.paramsForBuildToolBuild(buildJvm: Jvm = BuildToolBuildJvm, os: Os, arch: Arch = Arch.AMD64) {
     params {
-        param("env.BOT_TEAMCITY_GITHUB_TOKEN", "%github.bot-teamcity.token%")
-        param("env.GRADLE_CACHE_REMOTE_PASSWORD", "%gradle.cache.remote.password%")
-        param("env.GRADLE_CACHE_REMOTE_URL", "%gradle.cache.remote.url%")
-        param("env.GRADLE_CACHE_REMOTE_USERNAME", "%gradle.cache.remote.username%")
-
-        param("env.JAVA_HOME", javaHome(buildJvm, os, arch))
         param("env.GRADLE_OPTS", "-Xmx1536m -XX:MaxPermSize=384m")
-        param("env.ANDROID_HOME", os.androidHome)
-        param("env.ANDROID_SDK_ROOT", os.androidHome)
-        param("env.GRADLE_INTERNAL_REPO_URL", "%gradle.internal.repository.url%")
         if (os == Os.MACOS) {
             // Use fewer parallel forks on macOs, since the agents are not very powerful.
             param("maxParallelForks", "2")
