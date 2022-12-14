@@ -181,12 +181,19 @@ public class DefaultBuildOperationExecutor implements BuildOperationExecutor, St
         @Override
         public void start(BuildOperationDescriptor descriptor, BuildOperationState operationState) {
             buildOperationListener.started(descriptor, new OperationStartEvent(operationState.getStartTime()));
-            ProgressLogger progressLogger = progressLoggerFactory.newOperation(DefaultBuildOperationExecutor.class, descriptor);
-            this.progressLogger = progressLogger.start(descriptor.getDisplayName(), descriptor.getProgressDisplayName());
+            String progressDisplayName = descriptor.getProgressDisplayName();
+            if (progressDisplayName != null) {
+                ProgressLogger progressLogger = progressLoggerFactory.newOperation(DefaultBuildOperationExecutor.class, descriptor);
+                this.progressLogger = progressLogger.start(descriptor.getDisplayName(), progressDisplayName);
+            }
         }
 
         @Override
         public void progress(BuildOperationDescriptor descriptor, String status) {
+            if (progressLogger == null) {
+                return;
+            }
+
             // Currently, need to start a new progress operation to hold the status, as changing the status of the progress operation replaces the
             // progress display name on the console, whereas we want to display both the progress display name and the status
             // This should be pushed down into the progress logger infrastructure so that an operation can have both a display name (that doesn't change) and
@@ -210,7 +217,9 @@ public class DefaultBuildOperationExecutor implements BuildOperationExecutor, St
             if (statusProgressLogger != null) {
                 statusProgressLogger.completed();
             }
-            progressLogger.completed(context.getStatus(), context.getFailure() != null);
+            if (progressLogger != null) {
+                progressLogger.completed(context.getStatus(), context.getFailure() != null);
+            }
             buildOperationListener.finished(descriptor, new OperationFinishEvent(operationState.getStartTime(), clock.getCurrentTime(), context.getFailure(), context.getResult()));
         }
 
