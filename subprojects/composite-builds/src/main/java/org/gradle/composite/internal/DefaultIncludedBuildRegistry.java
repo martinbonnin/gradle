@@ -28,6 +28,7 @@ import org.gradle.internal.build.BuildState;
 import org.gradle.internal.build.BuildStateRegistry;
 import org.gradle.internal.build.IncludedBuildFactory;
 import org.gradle.internal.build.IncludedBuildState;
+import org.gradle.internal.build.PublicBuildPath;
 import org.gradle.internal.build.RootBuildState;
 import org.gradle.internal.build.StandAloneNestedBuild;
 import org.gradle.internal.buildtree.NestedBuildTree;
@@ -161,7 +162,7 @@ public class DefaultIncludedBuildRegistry implements BuildStateRegistry, Stoppab
         }
 
         BuildDefinition buildDefinition = buildStateFactory.buildDefinitionFor(buildSrcDir, owner);
-        Path identityPath = assignPath(owner, buildDefinition.getName(), buildDefinition.getBuildRootDir());
+        Path identityPath = assignPath(owner, buildDefinition.getName(), buildDefinition.getFromBuild(), buildDefinition.getBuildRootDir());
         BuildIdentifier buildIdentifier = idFor(buildDefinition.getName());
         StandAloneNestedBuild build = buildStateFactory.createNestedBuild(buildIdentifier, identityPath, buildDefinition, owner);
         buildSrcBuildsByOwner.put(owner, build);
@@ -176,7 +177,7 @@ public class DefaultIncludedBuildRegistry implements BuildStateRegistry, Stoppab
         File dir = buildDefinition.getStartParameter().getCurrentDir();
         String name = MoreObjects.firstNonNull(buildName, dir.getName());
         validateNameIsNotBuildSrc(name, dir);
-        Path identityPath = assignPath(owner, name, dir);
+        Path identityPath = assignPath(owner, name, buildDefinition.getFromBuild(), dir);
         BuildIdentifier buildIdentifier = idFor(name);
         return buildStateFactory.createNestedTree(buildDefinition, buildIdentifier, identityPath, owner);
     }
@@ -212,7 +213,7 @@ public class DefaultIncludedBuildRegistry implements BuildStateRegistry, Stoppab
                 throw new IllegalStateException("build name is required");
             }
             validateNameIsNotBuildSrc(buildName, buildDir);
-            Path idPath = assignPath(rootBuild, buildDefinition.getName(), buildDir);
+            Path idPath = assignPath(rootBuild, buildDefinition.getName(), buildDefinition.getFromBuild(), buildDir);
             BuildIdentifier buildIdentifier = idFor(buildName);
 
             includedBuild = includedBuildFactory.createBuild(buildIdentifier, idPath, buildDefinition, isImplicit, rootBuild);
@@ -239,11 +240,15 @@ public class DefaultIncludedBuildRegistry implements BuildStateRegistry, Stoppab
         return buildIdentifier;
     }
 
-    private Path assignPath(BuildState owner, String name, File dir) {
+    private Path assignPath(BuildState owner, String name, PublicBuildPath fromBuild, File dir) {
         Path requestedPath = owner.getIdentityPath().append(Path.path(name));
         File existingForPath = includedBuildDirectoriesByPath.putIfAbsent(requestedPath, dir);
         if (existingForPath != null) {
-            throw new GradleException("Included build " + dir + " has build path " + requestedPath + " which is the same as included build " + existingForPath);
+            requestedPath = fromBuild.getBuildPath().append(Path.path(name));
+            existingForPath = includedBuildDirectoriesByPath.putIfAbsent(requestedPath, dir);
+            if (existingForPath != null) {
+                throw new GradleException("Included build " + dir + " has build path " + requestedPath + " which is the same as included build " + existingForPath);
+            }
         }
 
         return requestedPath;
