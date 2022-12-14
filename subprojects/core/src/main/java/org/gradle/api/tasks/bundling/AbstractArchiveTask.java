@@ -59,7 +59,7 @@ public abstract class AbstractArchiveTask extends AbstractCopyTask {
     private final Property<Boolean> archiveReproducibleFileOrder;
 
     public AbstractArchiveTask() {
-        ObjectFactory objectFactory = getProject().getObjects();
+        ObjectFactory objectFactory = getProjectUnchecked().getObjects();
 
         archiveDestinationDirectory = objectFactory.directoryProperty();
         archiveBaseName = objectFactory.property(String.class);
@@ -69,7 +69,7 @@ public abstract class AbstractArchiveTask extends AbstractCopyTask {
         archiveClassifier = objectFactory.property(String.class).convention("");
 
         archiveName = objectFactory.property(String.class);
-        archiveName.convention(getProject().provider(() -> {
+        archiveName.convention(getProjectUnchecked().provider(() -> {
             // [baseName]-[appendix]-[version]-[classifier].[extension]
             String name = GUtil.elvis(archiveBaseName.getOrNull(), "");
             name += maybe(name, archiveAppendix.getOrNull());

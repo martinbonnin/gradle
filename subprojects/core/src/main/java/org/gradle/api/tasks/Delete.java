@@ -43,7 +43,7 @@ import java.util.Set;
  */
 @DisableCachingByDefault(because = "Deletion cannot be cached")
 public abstract class Delete extends ConventionTask implements DeleteSpec {
-    private ConfigurableFileCollection paths = getProject().getObjects().fileCollection();
+    private ConfigurableFileCollection paths = getProjectUnchecked().getObjects().fileCollection();
 
     private boolean followSymlinks;
 

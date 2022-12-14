@@ -37,7 +37,7 @@ import java.util.Set;
 @NonNullApi
 @DisableCachingByDefault(because = "Super-class, not to be instantiated directly")
 public abstract class SourceTask extends ConventionTask implements PatternFilterable {
-    private ConfigurableFileCollection sourceFiles = getProject().getObjects().fileCollection();
+    private ConfigurableFileCollection sourceFiles = getProjectUnchecked().getObjects().fileCollection();
     private final PatternFilterable patternSet;
 
     public SourceTask() {
@@ -88,7 +88,7 @@ public abstract class SourceTask extends ConventionTask implements PatternFilter
      * @param source The source.
      */
     public void setSource(Object source) {
-        sourceFiles = getProject().getObjects().fileCollection().from(source);
+        sourceFiles = getProjectUnchecked().getObjects().fileCollection().from(source);
     }
 
     /**

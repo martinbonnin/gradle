@@ -39,7 +39,7 @@ public abstract class AbstractCompile extends SourceTask {
     private String targetCompatibility;
 
     public AbstractCompile() {
-        this.destinationDirectory = getProject().getObjects().directoryProperty();
+        this.destinationDirectory = getProjectUnchecked().getObjects().directoryProperty();
     }
 
     /**
