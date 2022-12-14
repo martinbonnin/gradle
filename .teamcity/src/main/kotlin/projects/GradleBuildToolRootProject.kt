@@ -20,6 +20,7 @@ class GradleBuildToolRootProject(branch: VersionedSettingsBranch) : Project({
             gradleWrapper(this@BuildType) {
                 name = "GRADLE_RUNNER"
                 tasks = "clean cli:test"
+                gradleParams = "--no-configuration-cache"
             }
         }
         features {
