@@ -33,6 +33,13 @@ repositories {
         }
     }
     maven {
+        name = "Kotlin DEV"
+        url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        mavenContent {
+            includeGroup("org.jetbrains.kotlin")
+        }
+    }
+    maven {
         name = "CHAMP libs"
         url = uri("https://releases.usethesource.io/maven/")
         mavenContent {

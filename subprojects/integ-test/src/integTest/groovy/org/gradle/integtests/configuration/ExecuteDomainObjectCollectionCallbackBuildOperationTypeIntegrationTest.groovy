@@ -24,6 +24,7 @@ import org.gradle.configuration.internal.ExecuteListenerBuildOperationType
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.BuildOperationsFixture
 import org.gradle.internal.operations.trace.BuildOperationRecord
+import spock.lang.Ignore
 
 class ExecuteDomainObjectCollectionCallbackBuildOperationTypeIntegrationTest extends AbstractIntegrationSpec {
 
@@ -275,6 +276,7 @@ class ExecuteDomainObjectCollectionCallbackBuildOperationTypeIntegrationTest ext
         'plugins'        | "matching {it.class.simpleName == 'FooPlugin'}"            | { name -> "apply plugin:${name.capitalize()}Plugin" }
     }
 
+    @Ignore("Kotlin DEV")
     def "container callbacks registered from lifecycle listener emit build operation with application id"() {
         given:
         file('registration.gradle') << """
@@ -318,6 +320,7 @@ class ExecuteDomainObjectCollectionCallbackBuildOperationTypeIntegrationTest ext
         repositoriesContainerCallbackBuildOps.every { it.details.applicationId == callbackPluginApplication.details.applicationId }
     }
 
+    @Ignore("Kotlin DEV")
     def "applicationId for cross script buildscript configuration is emitted correctly"() {
         given:
         settingsFile << """
@@ -349,6 +352,7 @@ class ExecuteDomainObjectCollectionCallbackBuildOperationTypeIntegrationTest ext
         findCallbackActionBuildOp('script repo callback').details.applicationId == settingsScriptApplicationId.details.applicationId
     }
 
+    @Ignore("Kotlin DEV")
     def "applicationIds for container callbacks registered in beforeResolve and afterResolve callbacks are emitted correctly"() {
         given:
         file('callback.gradle') << """

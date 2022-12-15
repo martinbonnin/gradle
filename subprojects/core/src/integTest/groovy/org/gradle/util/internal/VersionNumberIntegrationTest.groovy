@@ -18,10 +18,12 @@ package org.gradle.util.internal
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.test.fixtures.dsl.GradleDsl
+import spock.lang.Ignore
 
 
 class VersionNumberIntegrationTest extends AbstractIntegrationSpec {
 
+    @Ignore("Kotlin DEV")
     def "nullability with Kotlin jsr-305 strict"() {
 
         given:

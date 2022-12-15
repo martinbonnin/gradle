@@ -17,7 +17,9 @@
 package org.gradle.integtests
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
+import spock.lang.Ignore
 
+@Ignore("Kotlin DEV")
 class PluginConfigurationAttributesIntegrationTest extends AbstractIntegrationSpec {
 
     def setup() {

@@ -445,6 +445,7 @@ class PrecompiledScriptPluginTemplatesTest : AbstractPrecompiledScriptPluginTest
         assertUndecoratedImplicitReceiverOf<Gradle>("my-init-plugin.init.gradle.kts")
     }
 
+    // TODO INVESTIGATE !!!
     @Test
     fun `nested plugins block fails to compile with reasonable message`() {
 

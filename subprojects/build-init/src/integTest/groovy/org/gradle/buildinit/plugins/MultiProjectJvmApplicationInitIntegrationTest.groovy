@@ -19,6 +19,7 @@ package org.gradle.buildinit.plugins
 import org.gradle.buildinit.plugins.internal.modifiers.BuildInitDsl
 import org.gradle.buildinit.plugins.internal.modifiers.Language
 import org.gradle.integtests.fixtures.DefaultTestExecutionResult
+import spock.lang.Ignore
 import spock.lang.Unroll
 
 import static org.gradle.buildinit.plugins.internal.modifiers.Language.GROOVY
@@ -26,6 +27,7 @@ import static org.gradle.buildinit.plugins.internal.modifiers.Language.JAVA
 import static org.gradle.buildinit.plugins.internal.modifiers.Language.KOTLIN
 import static org.gradle.buildinit.plugins.internal.modifiers.Language.SCALA
 
+@Ignore("Kotlin DEV")
 abstract class AbstractMultiProjectJvmApplicationInitIntegrationTest extends AbstractInitIntegrationSpec {
     abstract BuildInitDsl getBuildDsl()
     abstract Language getJvmLanguage()

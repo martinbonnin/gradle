@@ -16,6 +16,7 @@
 package org.gradle.integtests
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
+import spock.lang.Ignore
 
 class GroovyProjectIntegrationTest extends AbstractIntegrationSpec {
 
@@ -34,6 +35,7 @@ class GroovyProjectIntegrationTest extends AbstractIntegrationSpec {
         file("build/libs/javaOnly.jar").exists()
     }
 
+    @Ignore("Kotlin DEV")
     def "supports central repository declaration"() {
         given:
         buildFile << """

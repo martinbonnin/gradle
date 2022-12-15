@@ -17,6 +17,9 @@
 package org.gradle.initialization;
 
 import org.gradle.StartParameter;
+import org.gradle.api.Action;
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository;
+import org.gradle.api.initialization.Settings;
 import org.gradle.api.internal.GradleInternal;
 import org.gradle.api.internal.SettingsInternal;
 import org.gradle.api.internal.initialization.ClassLoaderScope;
@@ -33,8 +36,25 @@ public class SettingsEvaluatedCallbackFiringSettingsProcessor implements Setting
     public SettingsState process(GradleInternal gradle, SettingsLocation settingsLocation, ClassLoaderScope buildRootClassLoaderScope, StartParameter startParameter) {
         SettingsState state = delegate.process(gradle, settingsLocation, buildRootClassLoaderScope, startParameter);
         SettingsInternal settings = state.getSettings();
+        addKotlinDevRepositories(state.getSettings());
         gradle.getBuildListenerBroadcaster().settingsEvaluated(settings);
         settings.preventFromFurtherMutation();
         return state;
+    }
+
+    private void addKotlinDevRepositories(Settings settings) {
+        Action<MavenArtifactRepository> repoAction = repo -> {
+            repo.setName("Kotlin DEV");
+            repo.setUrl("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev");
+            repo.mavenContent(content -> content.includeGroup("org.jetbrains.kotlin"));
+        };
+        settings.getBuildscript().getRepositories().maven(repoAction);
+        settings.getPluginManagement().getRepositories().maven(repoAction);
+        settings.getPluginManagement().getRepositories().gradlePluginPortal();
+        settings.getGradle().beforeProject(p -> {
+            p.getBuildscript().getRepositories().maven(repoAction);
+            p.getBuildscript().getRepositories().gradlePluginPortal();
+            p.getRepositories().maven(repoAction);
+        });
     }
 }
