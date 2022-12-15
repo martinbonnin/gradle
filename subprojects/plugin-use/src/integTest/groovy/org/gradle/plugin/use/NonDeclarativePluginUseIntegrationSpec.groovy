@@ -18,6 +18,7 @@ package org.gradle.plugin.use
 
 import org.gradle.test.fixtures.file.LeaksFileHandles
 import org.gradle.test.fixtures.plugin.PluginBuilder
+import spock.lang.Ignore
 
 import static org.hamcrest.CoreMatchers.containsString
 import static org.hamcrest.CoreMatchers.startsWith
@@ -206,6 +207,7 @@ class NonDeclarativePluginUseIntegrationSpec extends AbstractPluginSpec {
         output.contains "buildscriptDependencies - 2"
     }
 
+    @Ignore("Kotlin DEV")
     def "failure due to no plugin with id in implementation"() {
         when:
         pluginBuilder.with {
