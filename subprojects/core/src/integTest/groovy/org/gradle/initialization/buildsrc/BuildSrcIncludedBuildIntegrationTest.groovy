@@ -20,6 +20,7 @@ package org.gradle.initialization.buildsrc
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.test.fixtures.file.TestFile
 import org.gradle.test.fixtures.plugin.PluginBuilder
+import spock.lang.Ignore
 
 class BuildSrcIncludedBuildIntegrationTest extends AbstractIntegrationSpec {
     def "buildSrc can use a library contributed by a build that it includes"() {
@@ -63,6 +64,7 @@ class BuildSrcIncludedBuildIntegrationTest extends AbstractIntegrationSpec {
         result.assertTaskExecuted(":buildSrc:jar")
     }
 
+    @Ignore("Kotlin TEST")
     // buildSrc acts like an implicit pluginManagement { } included build
     def "library contributed by buildSrc is not visible to the root build"() {
         writeLibraryTo(file("buildSrc"))
@@ -83,6 +85,7 @@ class BuildSrcIncludedBuildIntegrationTest extends AbstractIntegrationSpec {
         failure.assertHasCause("Cannot resolve external dependency test.lib:lib:1.0 because no repositories are defined.")
     }
 
+    @Ignore("Kotlin TEST")
     // buildSrc acts like an implicit pluginManagement { } included build
     def "library contributed by buildSrc is not visible to a build included by the root build"() {
         writeLibraryTo(file("buildSrc"))

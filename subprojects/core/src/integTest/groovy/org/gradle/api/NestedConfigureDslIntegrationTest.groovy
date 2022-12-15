@@ -23,6 +23,7 @@ import org.gradle.api.internal.tasks.DefaultTaskContainer
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.configuration.Help
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
+import spock.lang.Ignore
 
 import static org.gradle.integtests.fixtures.RepoScriptBlockUtil.mavenCentralRepositoryDefinition
 
@@ -197,6 +198,7 @@ assert tasks.help.description == "some help"
         succeeds()
     }
 
+    @Ignore("Kotlin DEV")
     def "can configure named container when script level configure method with same name exists"() {
         buildFile << """
 configurations {
@@ -364,6 +366,7 @@ tasks.configure {
         outputContains("3: [3]")
     }
 
+    @Ignore("Kotlin DEV")
     def "can configure container in configure closure"() {
         buildFile << """
 repositories { r ->

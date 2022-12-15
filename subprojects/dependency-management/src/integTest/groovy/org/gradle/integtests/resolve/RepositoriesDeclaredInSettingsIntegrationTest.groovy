@@ -23,6 +23,7 @@ import org.gradle.test.fixtures.server.http.MavenHttpPluginRepository
 import org.gradle.util.GradleVersion
 import org.gradle.util.TestPrecondition
 import org.gradle.util.internal.ToBeImplemented
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Issue
 
@@ -485,6 +486,7 @@ class RepositoriesDeclaredInSettingsIntegrationTest extends AbstractModuleDepend
         failure.assertHasCause("Could not find org:module:1.0.")
     }
 
+    @Ignore("Kotlin DEV")
     def "mutation of repositories is project local"() {
         repository {
             'org:module:1.0'()
@@ -540,6 +542,7 @@ class RepositoriesDeclaredInSettingsIntegrationTest extends AbstractModuleDepend
      * the `buildSrc` directory behaves like an included build. As such, it may have its own settings,
      * so repositories declared in the main build shouldn't be visible to buildSrc.
      */
+    @Ignore("Kotlin DEV")
     def "repositories declared in settings shouldn't be used to resolve dependencies in buildSrc"() {
         repository {
             'org:module:1.0'()

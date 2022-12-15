@@ -17,6 +17,7 @@
 package org.gradle.integtests.composite
 
 import org.gradle.integtests.fixtures.build.BuildTestFile
+import spock.lang.Ignore
 
 class CompositeBuildBuildSrcIdentityIntegrationTest extends AbstractCompositeBuildIntegrationTest {
     BuildTestFile buildB
@@ -87,6 +88,7 @@ runtimeClasspath - Runtime classpath of source set 'main'.
         "rootProject.name='someLib'" | "configured root project name"
     }
 
+    @Ignore("Kotlin DEV")
     def "includes build identifier in error message on failure to resolve dependencies of build with #display"() {
         dependency "org.test:buildB:1.0"
 

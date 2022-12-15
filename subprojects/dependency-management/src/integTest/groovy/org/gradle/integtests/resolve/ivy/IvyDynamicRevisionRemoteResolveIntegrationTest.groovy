@@ -21,6 +21,7 @@ import org.gradle.integtests.fixtures.resolve.ResolveTestFixture
 import org.gradle.test.fixtures.Repository
 import org.gradle.test.fixtures.encoding.Identifier
 import org.gradle.test.fixtures.server.http.IvyHttpModule
+import spock.lang.Ignore
 import spock.lang.Issue
 
 class IvyDynamicRevisionRemoteResolveIntegrationTest extends AbstractHttpDependencyResolutionTest {
@@ -1077,6 +1078,7 @@ Required by:
         checkResolve "group:projectA:2.+": "group:projectA:2.2"
     }
 
+    @Ignore("Kotlin DEV")
     def "reports and recovers from missing dynamic version when no repositories defined"() {
         given:
         buildFile << """

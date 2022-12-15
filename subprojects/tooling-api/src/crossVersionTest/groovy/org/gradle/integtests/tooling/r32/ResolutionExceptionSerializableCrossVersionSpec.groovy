@@ -20,8 +20,10 @@ import org.gradle.integtests.tooling.fixture.TargetGradleVersion
 import org.gradle.integtests.tooling.fixture.ToolingApiSpecification
 import org.gradle.integtests.tooling.fixture.ToolingApiVersion
 import org.gradle.integtests.tooling.fixture.WithOldConfigurationsSupport
+import spock.lang.Ignore
 import spock.lang.Issue
 
+@Ignore("Kotlin DEV")
 class ResolutionExceptionSerializableCrossVersionSpec extends ToolingApiSpecification implements WithOldConfigurationsSupport {
     def setup() {
         file('build.gradle') << """
@@ -66,6 +68,7 @@ class CustomPlugin implements Plugin<Project> {
 """
     }
 
+    @Ignore("Kotlin DEV")
     @Issue("GRADLE-3307")
     @ToolingApiVersion(">=3.2")
     @TargetGradleVersion(">=3.2")

@@ -20,6 +20,7 @@ import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import org.gradle.vcs.fixtures.GitFileRepository
 import org.junit.Rule
+import spock.lang.Ignore
 
 
 class NestedSourceDependencyIdentityIntegrationTest extends AbstractIntegrationSpec {
@@ -76,6 +77,7 @@ class NestedSourceDependencyIdentityIntegrationTest extends AbstractIntegrationS
         """
     }
 
+    @Ignore("Kotlin DEV")
     def "includes build identifier in error message on failure to resolve dependencies of build with #display"() {
         repoC.file("settings.gradle") << """
             ${settings}

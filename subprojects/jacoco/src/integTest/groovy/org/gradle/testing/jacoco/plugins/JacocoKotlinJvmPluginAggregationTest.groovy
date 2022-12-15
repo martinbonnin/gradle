@@ -18,6 +18,7 @@ package org.gradle.testing.jacoco.plugins
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.testing.jacoco.plugins.fixtures.JacocoReportXmlFixture
+import spock.lang.Ignore
 import spock.lang.Issue
 
 /**
@@ -30,6 +31,7 @@ import spock.lang.Issue
  * all files to be added to the jacoco report to ensure none are zip), this test will fail.
  */
 @Issue("https://github.com/gradle/gradle/issues/20532")
+@Ignore("Kotlin DEV")
 class JacocoKotlinJvmPluginAggregationTest extends AbstractIntegrationSpec {
     def kotlinVersion = "1.8.0-RC2-330" // Must remain >= 1.7, lower versions will produce deprecations warnings, on CI versions >= 1.7 will be used
 

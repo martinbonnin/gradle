@@ -19,6 +19,7 @@ package org.gradle.catalog
 
 import org.gradle.integtests.fixtures.AbstractHttpDependencyResolutionTest
 import org.gradle.test.fixtures.file.TestFile
+import spock.lang.Ignore
 
 
 class VersionCatalogResolveIntegrationTest extends AbstractHttpDependencyResolutionTest implements VersionCatalogSupport {
@@ -184,6 +185,7 @@ org.gradle.test:my-platform:1.0=incomingCatalogForLibs0
         failure.assertHasCause "Could not find org.gradle.test:my-platform:1.0."
     }
 
+    @Ignore("Kotlin DEV")
     def "reasonable error message if a no repositories are defined in settings"() {
         settingsFile << """
             dependencyResolutionManagement {
