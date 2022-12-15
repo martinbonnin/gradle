@@ -18,6 +18,7 @@ package org.gradle.internal.buildtree;
 
 import org.gradle.api.internal.GradleInternal;
 import org.gradle.api.internal.project.ProjectState;
+import org.gradle.api.internal.provider.DefaultConfigurationTimeBarrier;
 import org.gradle.internal.UncheckedException;
 import org.gradle.internal.build.BuildState;
 import org.gradle.internal.build.BuildToolingModelController;
@@ -34,26 +35,31 @@ public class DefaultBuildTreeModelCreator implements BuildTreeModelCreator {
     private final ProjectLeaseRegistry projectLeaseRegistry;
     private final BuildOperationExecutor buildOperationExecutor;
     private final boolean parallelActions;
+    private final DefaultConfigurationTimeBarrier configurationTimeBarrier;
 
     public DefaultBuildTreeModelCreator(
         BuildModelParameters buildModelParameters,
         BuildState defaultTarget,
         BuildOperationExecutor buildOperationExecutor,
-        ProjectLeaseRegistry projectLeaseRegistry
+        ProjectLeaseRegistry projectLeaseRegistry,
+        DefaultConfigurationTimeBarrier configurationTimeBarrier
     ) {
         this.defaultTarget = defaultTarget;
         this.projectLeaseRegistry = projectLeaseRegistry;
         this.buildOperationExecutor = buildOperationExecutor;
         this.parallelActions = buildModelParameters.isParallelToolingApiActions();
+        this.configurationTimeBarrier = configurationTimeBarrier;
     }
 
     @Override
     public <T> void beforeTasks(BuildTreeModelAction<? extends T> action) {
+        configurationTimeBarrier.prepare();
         action.beforeTasks(new DefaultBuildTreeModelController());
     }
 
     @Override
     public <T> T fromBuildModel(BuildTreeModelAction<? extends T> action) {
+        configurationTimeBarrier.prepare();
         return action.fromBuildModel(new DefaultBuildTreeModelController());
     }
 

@@ -17,6 +17,7 @@
 package org.gradle.internal.buildtree
 
 import org.gradle.api.internal.GradleInternal
+import org.gradle.api.internal.provider.DefaultConfigurationTimeBarrier
 import org.gradle.internal.build.BuildLifecycleController
 import org.gradle.internal.build.ExecutionResult
 import org.gradle.util.TestUtil
@@ -30,7 +31,9 @@ class DefaultBuildTreeLifecycleControllerTest extends Specification {
     def workController = Mock(BuildTreeWorkController)
     def modelCreator = Mock(BuildTreeModelCreator)
     def finishExecutor = Mock(BuildTreeFinishExecutor)
-    def controller = new DefaultBuildTreeLifecycleController(buildController, workController, modelCreator, finishExecutor, TestUtil.stateTransitionControllerFactory())
+    def controller = new DefaultBuildTreeLifecycleController(
+        buildController, workController, modelCreator, finishExecutor, TestUtil.stateTransitionControllerFactory(), new DefaultConfigurationTimeBarrier()
+    )
     def reportableFailure = new RuntimeException()
 
     def setup() {
