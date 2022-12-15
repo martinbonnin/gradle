@@ -22,6 +22,7 @@ import org.gradle.test.fixtures.file.TestFile
 import spock.lang.Ignore
 
 
+@Ignore("Kotlin DEV")
 class VersionCatalogResolveIntegrationTest extends AbstractHttpDependencyResolutionTest implements VersionCatalogSupport {
     def setup() {
         settingsFile << """

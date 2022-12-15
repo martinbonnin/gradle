@@ -27,9 +27,11 @@ import org.gradle.integtests.resolve.PluginDslSupport
 import org.gradle.test.fixtures.file.TestFile
 import org.gradle.test.fixtures.server.http.MavenHttpPluginRepository
 import org.junit.Rule
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Issue
 
+@Ignore("Kotlin DEV")
 class TomlDependenciesExtensionIntegrationTest extends AbstractVersionCatalogIntegrationTest implements PluginDslSupport, VersionCatalogErrorMessages {
 
     @Rule

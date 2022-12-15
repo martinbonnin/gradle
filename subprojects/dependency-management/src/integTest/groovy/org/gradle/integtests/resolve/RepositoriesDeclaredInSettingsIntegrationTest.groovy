@@ -30,6 +30,7 @@ import spock.lang.Issue
 // Restrict the number of combinations because that's not really what we want to test
 @RequiredFeature(feature = GradleMetadataResolveRunner.REPOSITORY_TYPE, value = "maven")
 @RequiredFeature(feature = GradleMetadataResolveRunner.GRADLE_METADATA, value = "true")
+@Ignore("Kotlin DEV")
 class RepositoriesDeclaredInSettingsIntegrationTest extends AbstractModuleDependencyResolveTest implements PluginDslSupport {
     boolean isDeclareRepositoriesInSettings() {
         true

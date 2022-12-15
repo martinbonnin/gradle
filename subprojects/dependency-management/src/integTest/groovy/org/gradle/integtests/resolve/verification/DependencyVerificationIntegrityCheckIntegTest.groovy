@@ -21,6 +21,7 @@ import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import org.gradle.integtests.fixtures.cache.CachingIntegrationFixture
 import org.gradle.integtests.fixtures.executer.GradleContextualExecuter
 import org.gradle.test.fixtures.file.TestFile
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Issue
 
@@ -464,6 +465,7 @@ This can indicate that a dependency has been compromised. Please carefully verif
         failure.assertHasCause("""Dependency verification failed""")
     }
 
+    @Ignore("Kotlin DEV")
     def "can detect a compromised plugin using buildscript block (terse output=#terse)"() {
         createMetadataFile {
             addChecksum("com:myplugin", "sha1", "woot")

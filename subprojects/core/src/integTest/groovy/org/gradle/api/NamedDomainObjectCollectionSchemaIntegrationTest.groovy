@@ -17,6 +17,7 @@
 package org.gradle.api
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
+import spock.lang.Ignore
 
 class NamedDomainObjectCollectionSchemaIntegrationTest extends AbstractIntegrationSpec {
     def setup() {
@@ -64,6 +65,7 @@ class NamedDomainObjectCollectionSchemaIntegrationTest extends AbstractIntegrati
         succeeds("assertSchema")
     }
 
+    @Ignore("Kotlin DEV")
     def "built-in container types presents public type in schema"() {
         buildFile """
             apply plugin: 'java'

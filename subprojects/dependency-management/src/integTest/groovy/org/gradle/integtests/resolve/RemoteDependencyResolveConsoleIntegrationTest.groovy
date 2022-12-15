@@ -24,7 +24,9 @@ import org.gradle.integtests.fixtures.executer.LogContent
 import org.gradle.test.fixtures.ConcurrentTestUtil
 import org.gradle.test.fixtures.server.http.BlockingHttpServer
 import org.junit.Rule
+import spock.lang.Ignore
 
+@Ignore("Kotlin DEV")
 class RemoteDependencyResolveConsoleIntegrationTest extends AbstractDependencyResolutionTest {
     @Rule
     BlockingHttpServer server = new BlockingHttpServer()

@@ -20,6 +20,7 @@ import org.gradle.integtests.fixtures.GradleMetadataResolveRunner
 import org.gradle.integtests.fixtures.RequiredFeature
 import org.gradle.integtests.resolve.AbstractModuleDependencyResolveTest
 import org.gradle.test.fixtures.HttpRepository
+import spock.lang.Ignore
 
 class MetadataSourcesResolveIntegrationTest extends AbstractModuleDependencyResolveTest {
 
@@ -63,6 +64,7 @@ class MetadataSourcesResolveIntegrationTest extends AbstractModuleDependencyReso
         }
     }
 
+    @Ignore("Kotlin DEV")
     def "can resolve with only repository-specific metadata"() {
         def metadataSource = useIvy() ? "ivyDescriptor" : "mavenPom"
         buildFile << """
@@ -147,6 +149,7 @@ class MetadataSourcesResolveIntegrationTest extends AbstractModuleDependencyReso
         }
     }
 
+    @Ignore("Kotlin DEV")
     def "will only search for defined metadata sources"() {
         def metadataSource = isGradleMetadataPublished() ? "gradleMetadata" : useIvy() ? "ivyDescriptor" : "mavenPom"
         def metadataType = isGradleMetadataPublished() ? HttpRepository.MetadataType.ONLY_GRADLE : HttpRepository.MetadataType.ONLY_ORIGINAL

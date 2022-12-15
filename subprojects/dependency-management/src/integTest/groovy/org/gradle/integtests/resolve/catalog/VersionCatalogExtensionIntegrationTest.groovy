@@ -20,8 +20,10 @@ import org.gradle.api.internal.catalog.problems.VersionCatalogErrorMessages
 import org.gradle.api.internal.catalog.problems.VersionCatalogProblemId
 import org.gradle.api.internal.catalog.problems.VersionCatalogProblemTestFor
 import org.gradle.integtests.resolve.PluginDslSupport
+import spock.lang.Ignore
 import spock.lang.Issue
 
+@Ignore("Kotlin DEV")
 class VersionCatalogExtensionIntegrationTest extends AbstractVersionCatalogIntegrationTest implements PluginDslSupport, VersionCatalogErrorMessages {
 
     def "dependencies declared in settings trigger the creation of an extension (notation=#notation)"() {

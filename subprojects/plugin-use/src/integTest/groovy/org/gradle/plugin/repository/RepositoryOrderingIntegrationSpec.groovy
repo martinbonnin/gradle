@@ -16,6 +16,7 @@
 package org.gradle.plugin.repository
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
+import spock.lang.Ignore
 import spock.lang.Issue
 
 import static org.gradle.api.internal.artifacts.BaseRepositoryFactory.PLUGIN_PORTAL_OVERRIDE_URL_PROPERTY
@@ -23,6 +24,7 @@ import static org.gradle.api.internal.artifacts.BaseRepositoryFactory.PLUGIN_POR
 
 class RepositoryOrderingIntegrationSpec extends AbstractIntegrationSpec {
 
+    @Ignore("Kotlin DEV")
     @Issue("gradle/gradle#4310")
     def "buildscript repositories searched before plugin management repositories"() {
 
