@@ -143,6 +143,7 @@ dependencies {
         identifier << Identifier.all
     }
 
+    @Ignore("Kotlin DEV")
     def "determines latest version with jar only if artifact metadata source is configured"() {
         given:
         useRepository ivyHttpRepo

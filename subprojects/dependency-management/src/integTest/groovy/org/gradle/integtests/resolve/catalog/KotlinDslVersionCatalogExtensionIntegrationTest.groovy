@@ -20,6 +20,7 @@ import org.gradle.integtests.fixtures.AbstractHttpDependencyResolutionTest
 import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import org.gradle.integtests.fixtures.UnsupportedWithConfigurationCache
 import org.gradle.test.fixtures.file.LeaksFileHandles
+import spock.lang.Ignore
 import spock.lang.Issue
 
 /**
@@ -29,6 +30,7 @@ import spock.lang.Issue
  * tests so avoid adding tests here if they cannot be expressed with the Groovy DSL.
  */
 @LeaksFileHandles("Kotlin Compiler Daemon working directory")
+@Ignore("Kotlin DEV")
 class KotlinDslVersionCatalogExtensionIntegrationTest extends AbstractHttpDependencyResolutionTest {
     def setup() {
         settingsKotlinFile << """

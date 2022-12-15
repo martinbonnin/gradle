@@ -18,6 +18,7 @@ package org.gradle.integtests.resolve.rules
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.resolve.ResolveTestFixture
+import spock.lang.Ignore
 
 class DependencyResolveRulesDisableGlobalDependencySubstitutionIntegrationTest extends AbstractIntegrationSpec {
 
@@ -118,6 +119,7 @@ class DependencyResolveRulesDisableGlobalDependencySubstitutionIntegrationTest e
         true
     }
 
+    @Ignore("Kotlin DEV")
     def "global dependency substitution is only disabled for the configuration that it is configured for"() {
         when:
         resolveLocalPath()
@@ -150,7 +152,7 @@ class DependencyResolveRulesDisableGlobalDependencySubstitutionIntegrationTest e
         expectResolvedToLocal(resolvePublished)
     }
 
-
+    @Ignore("Kotlin DEV")
     def "global dependency substitution can be disabled for all configurations"() {
         given:
         buildFile << """

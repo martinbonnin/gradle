@@ -18,6 +18,7 @@ package org.gradle.integtests
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.ZincScalaCompileFixture
 import org.junit.Rule
+import spock.lang.Ignore
 
 class ScalaProjectIntegrationTest extends AbstractIntegrationSpec {
     @Rule
@@ -39,6 +40,7 @@ class ScalaProjectIntegrationTest extends AbstractIntegrationSpec {
         file("build/libs/javaOnly.jar").assertExists()
     }
 
+    @Ignore("Kotlin DEV")
     def "supports central repository declaration"() {
         given:
         buildFile << """

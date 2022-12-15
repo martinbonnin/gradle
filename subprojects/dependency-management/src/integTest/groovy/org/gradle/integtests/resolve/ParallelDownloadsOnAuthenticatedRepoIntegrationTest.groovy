@@ -16,6 +16,9 @@
 
 package org.gradle.integtests.resolve
 
+import spock.lang.Ignore
+
+@Ignore("Kotlin DEV")
 class ParallelDownloadsOnAuthenticatedRepoIntegrationTest extends ParallelDownloadsIntegrationTest {
     private final static String USERNAME = 'username'
     private final static String PASSWORD = 'password'
