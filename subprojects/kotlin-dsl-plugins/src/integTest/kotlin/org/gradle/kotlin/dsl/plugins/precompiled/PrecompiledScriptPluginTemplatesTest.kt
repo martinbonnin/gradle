@@ -445,7 +445,6 @@ class PrecompiledScriptPluginTemplatesTest : AbstractPrecompiledScriptPluginTest
         assertUndecoratedImplicitReceiverOf<Gradle>("my-init-plugin.init.gradle.kts")
     }
 
-    // TODO INVESTIGATE !!!
     @Test
     fun `nested plugins block fails to compile with reasonable message`() {
 
@@ -466,7 +465,7 @@ class PrecompiledScriptPluginTemplatesTest : AbstractPrecompiledScriptPluginTest
                 "Execution failed for task ':compileKotlin'."
             )
             assertHasErrorOutput(
-                """my-project-plugin.gradle.kts: (3, 17): Using 'plugins(PluginDependenciesSpec.() -> Unit): Nothing' is an error. The plugins {} block must not be used here. If you need to apply a plugin imperatively, please use apply<PluginType>() or apply(plugin = "id") instead."""
+                """my-project-plugin.gradle.kts:3:17 Using 'plugins(PluginDependenciesSpec.() -> Unit): Nothing' is an error. The plugins {} block must not be used here. If you need to apply a plugin imperatively, please use apply<PluginType>() or apply(plugin = "id") instead."""
             )
         }
     }
