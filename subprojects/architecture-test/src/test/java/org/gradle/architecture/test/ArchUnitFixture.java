@@ -35,7 +35,6 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import com.tngtech.archunit.library.freeze.FreezingArchRule;
-import org.gradle.util.BaseTestPreconditions;
 import org.gradle.util.EmptyStatement;
 import org.gradle.util.Matchers;
 import org.gradle.util.PreconditionVerifier;
@@ -212,7 +211,6 @@ public interface ArchUnitFixture {
             SetSystemProperties.class,
             TestClassLoader.class,
             TestPrecondition.class,
-            BaseTestPreconditions.class,
             UnitTestPreconditions.class,
             TestPreconditionExtension.class,
             UsesNativeServices.class,
