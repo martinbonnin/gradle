@@ -46,7 +46,7 @@ public class SettingsEvaluatedCallbackFiringSettingsProcessor implements Setting
         Action<MavenArtifactRepository> repoAction = repo -> {
             repo.setName("Kotlin DEV");
             repo.setUrl("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev");
-            repo.mavenContent(content -> content.includeGroup("org.jetbrains.kotlin"));
+            repo.mavenContent(content -> content.includeGroupByRegex("org\\.jetbrains\\.kotlin.*"));
         };
         settings.getBuildscript().getRepositories().maven(repoAction);
         settings.getPluginManagement().getRepositories().maven(repoAction);
