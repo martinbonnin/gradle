@@ -59,7 +59,7 @@ import org.jetbrains.kotlin.config.JvmAnalysisFlags
 import org.jetbrains.kotlin.config.JvmClosureGenerationScheme
 import org.jetbrains.kotlin.config.JvmDefaultMode
 import org.jetbrains.kotlin.config.JvmTarget
-import org.jetbrains.kotlin.config.JvmTarget.JVM_18
+import org.jetbrains.kotlin.config.JvmTarget.JVM_19
 import org.jetbrains.kotlin.config.JvmTarget.JVM_1_8
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersion
@@ -371,7 +371,7 @@ fun JavaVersion.toKotlinJvmTarget(): JvmTarget {
     // JvmTarget.fromString(JavaVersion.majorVersion) works from Java 9 to Java 18
     return JvmTarget.fromString(majorVersion)
         ?: if (this <= JavaVersion.VERSION_1_8) JVM_1_8
-        else JVM_18
+        else JVM_19
 }
 
 
