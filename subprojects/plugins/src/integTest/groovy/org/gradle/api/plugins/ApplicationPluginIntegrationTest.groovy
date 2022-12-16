@@ -369,8 +369,9 @@ executableDir = 'foo/bar'
             }
 
             task printRunClasspath {
+                def runClasspath = run.classpath
                 doLast {
-                    println run.classpath.collect{ it.name }.join(',')
+                    println runClasspath.collect{ it.name }.join(',')
                 }
             }
 
