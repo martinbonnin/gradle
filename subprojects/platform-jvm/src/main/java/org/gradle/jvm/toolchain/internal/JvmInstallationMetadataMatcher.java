@@ -24,17 +24,12 @@ import org.gradle.jvm.toolchain.JvmImplementation;
 
 import java.util.function.Predicate;
 
-public class JavaToolchainMatcher implements Predicate<JavaToolchain> {
+public class JvmInstallationMetadataMatcher implements Predicate<JvmInstallationMetadata> {
 
     private final JavaToolchainSpec spec;
 
-    public JavaToolchainMatcher(JavaToolchainSpec spec) {
+    public JvmInstallationMetadataMatcher(JavaToolchainSpec spec) {
         this.spec = spec;
-    }
-
-    @Override
-    public boolean test(JavaToolchain toolchain) {
-        return test(toolchain.getMetadata());
     }
 
     public boolean test(JvmInstallationMetadata metadata) {

@@ -17,7 +17,6 @@
 package org.gradle.jvm.toolchain.internal;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Supplier;
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -27,6 +26,7 @@ import org.gradle.internal.operations.BuildOperationExecutor;
 import org.gradle.internal.operations.CallableBuildOperation;
 import org.gradle.internal.os.OperatingSystem;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +36,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
 
 public class JavaInstallationRegistry {
     private final BuildOperationExecutor executor;
@@ -46,14 +46,14 @@ public class JavaInstallationRegistry {
     private final OperatingSystem os;
 
     @Inject
-    public JavaInstallationRegistry(List<InstallationSupplier> suppliers, BuildOperationExecutor executor, OperatingSystem os) {
+    public JavaInstallationRegistry(List<InstallationSupplier> suppliers, @Nullable BuildOperationExecutor executor, OperatingSystem os) {
         this(suppliers, Logging.getLogger(JavaInstallationRegistry.class), executor, os);
     }
 
-    private JavaInstallationRegistry(List<InstallationSupplier> suppliers, Logger logger, BuildOperationExecutor executor, OperatingSystem os) {
+    private JavaInstallationRegistry(List<InstallationSupplier> suppliers, Logger logger, @Nullable BuildOperationExecutor executor, OperatingSystem os) {
         this.logger = logger;
         this.executor = executor;
-        this.installations = new Installations(() -> collectInBuildOperation(suppliers));
+        this.installations = new Installations(() -> maybeCollectInBuildOperation(suppliers));
         this.os = os;
     }
 
@@ -62,8 +62,12 @@ public class JavaInstallationRegistry {
         return new JavaInstallationRegistry(suppliers, logger, executor, OperatingSystem.current());
     }
 
-    private Set<InstallationLocation> collectInBuildOperation(List<InstallationSupplier> suppliers) {
-        return executor.call(new ToolchainDetectionBuildOperation(() -> collectInstallations(suppliers)));
+    private Set<InstallationLocation> maybeCollectInBuildOperation(List<InstallationSupplier> suppliers) {
+        if (executor != null) {
+            return executor.call(new ToolchainDetectionBuildOperation(() -> collectInstallations(suppliers)));
+        } else {
+            return collectInstallations(suppliers);
+        }
     }
 
     public Set<InstallationLocation> listInstallations() {
@@ -80,6 +84,7 @@ public class JavaInstallationRegistry {
             .flatMap(Set::stream)
             .filter(this::installationExists)
             .map(this::canonicalize)
+            .map(this::maybeGetEnclosedInstallation)
             .filter(distinctByKey(InstallationLocation::getLocation))
             .collect(Collectors.toSet());
     }
@@ -106,6 +111,16 @@ public class JavaInstallationRegistry {
         } catch (IOException e) {
             throw new GradleException(String.format("Could not canonicalize path to java installation: %s.", file), e);
         }
+    }
+
+    private InstallationLocation maybeGetEnclosedInstallation(InstallationLocation location) {
+        final File home = location.getLocation();
+        final File parentPath = home.getParentFile();
+        final boolean isEmbeddedJre = home.getName().equalsIgnoreCase("jre");
+        if (isEmbeddedJre && hasJavaExecutable(parentPath)) {
+            return new InstallationLocation(parentPath, location.getSource());
+        }
+        return location;
     }
 
     private File findJavaHome(File potentialHome) {
