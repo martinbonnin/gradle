@@ -94,4 +94,25 @@ class SupportedBuildJvmIntegrationTest extends AbstractIntegrationSpec {
         where:
         jdk << AvailableJavaHomes.getJdks("1.6", "1.7")
     }
+
+    @Requires(adhoc = { AvailableJavaHomes.getJdks("8", "11") })
+    def "daemon uses detected jvm. "() {
+        given:
+        executer.withJavaHome(AvailableJavaHomes.getJdks("8").javaHome)
+
+        when:
+        buildFile << """
+            task printJavaVersion {
+                println("Version: " + System.getProperty("java.version"))
+                println("JAVA_HOME: " + System.getProperty("java.home"))
+            }
+        """
+
+        then:
+        succeeds("printJavaVersion")
+
+        outputContains("Version: 11")
+    }
+
+
 }

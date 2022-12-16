@@ -99,6 +99,7 @@ public class BasicGlobalScopeServices {
         );
     }
 
+    // TODO: Can we get rid of this here?
     JvmVersionDetector createJvmVersionDetector(JvmMetadataDetector detector) {
         return new DefaultJvmVersionDetector(detector);
     }

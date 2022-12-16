@@ -17,10 +17,13 @@
 package org.gradle.launcher.cli;
 
 import com.google.common.annotations.VisibleForTesting;
+import net.rubygrapefruit.platform.WindowsRegistry;
 import org.gradle.StartParameter;
 import org.gradle.api.Action;
 import org.gradle.api.internal.StartParameterInternal;
 import org.gradle.api.internal.file.FileCollectionFactory;
+import org.gradle.api.internal.file.temp.TemporaryFileProvider;
+import org.gradle.api.internal.provider.BasicProviderFactory;
 import org.gradle.cli.CommandLineParser;
 import org.gradle.cli.ParsedCommandLine;
 import org.gradle.configuration.GradleLauncherMetaData;
@@ -31,7 +34,8 @@ import org.gradle.internal.SystemProperties;
 import org.gradle.internal.classpath.ClassPath;
 import org.gradle.internal.concurrent.CompositeStoppable;
 import org.gradle.internal.concurrent.Stoppable;
-import org.gradle.internal.jvm.inspection.JvmVersionDetector;
+import org.gradle.internal.jvm.Jvm;
+import org.gradle.internal.jvm.inspection.JvmInstallationMetadata;
 import org.gradle.internal.logging.events.OutputEventListener;
 import org.gradle.internal.nativeintegration.services.NativeServices;
 import org.gradle.internal.service.ServiceRegistry;
@@ -53,6 +57,7 @@ import org.gradle.launcher.exec.BuildActionExecuter;
 import org.gradle.launcher.exec.BuildActionParameters;
 import org.gradle.launcher.exec.BuildExecuter;
 import org.gradle.launcher.exec.DefaultBuildActionParameters;
+import org.gradle.process.internal.ExecFactory;
 
 import java.lang.management.ManagementFactory;
 import java.util.UUID;
@@ -60,19 +65,27 @@ import java.util.UUID;
 class BuildActionsFactory implements CommandLineActionCreator {
     private final ParametersConverter parametersConverter;
     private final ServiceRegistry loggingServices;
-    private final JvmVersionDetector jvmVersionDetector;
     private final FileCollectionFactory fileCollectionFactory;
     private final ServiceRegistry basicServices;
+    private final DaemonJvmSelector daemonJvmSelector;
 
     public BuildActionsFactory(ServiceRegistry loggingServices) {
+
         basicServices = ServiceRegistryBuilder.builder()
             .parent(loggingServices)
             .parent(NativeServices.getInstance())
             .provider(new BasicGlobalScopeServices()).build();
+
         this.loggingServices = loggingServices;
-        fileCollectionFactory = basicServices.get(FileCollectionFactory.class);
-        parametersConverter = new ParametersConverter(new BuildLayoutFactory(), basicServices.get(FileCollectionFactory.class));
-        jvmVersionDetector = basicServices.get(JvmVersionDetector.class);
+        this.fileCollectionFactory = basicServices.get(FileCollectionFactory.class);
+        this.parametersConverter = new ParametersConverter(new BuildLayoutFactory(), basicServices.get(FileCollectionFactory.class));
+
+        this.daemonJvmSelector = new DaemonJvmSelector(
+            new BasicProviderFactory(), // TODO: We need a better provider factory than this
+            basicServices.get(ExecFactory.class),
+            basicServices.get(TemporaryFileProvider.class),
+            basicServices.get(WindowsRegistry.class)
+        );
     }
 
     @Override
@@ -84,7 +97,9 @@ class BuildActionsFactory implements CommandLineActionCreator {
     public Action<? super ExecutionListener> createAction(CommandLineParser parser, ParsedCommandLine commandLine) {
         Parameters parameters = parametersConverter.convert(commandLine, null);
 
-        parameters.getDaemonParameters().applyDefaultsFor(jvmVersionDetector.getJavaVersion(parameters.getDaemonParameters().getEffectiveJvm()));
+        JvmInstallationMetadata installation = daemonJvmSelector.getDaemonJvmInstallation();
+        parameters.getDaemonParameters().setJvm(Jvm.forHome(installation.getJavaHome().toFile()));
+        parameters.getDaemonParameters().applyDefaultsFor(installation.getLanguageVersion());
 
         if (parameters.getDaemonParameters().isStop()) {
             return Actions.toAction(stopAllDaemons(parameters.getDaemonParameters()));
