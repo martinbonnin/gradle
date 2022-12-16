@@ -25,9 +25,11 @@ import org.gradle.test.fixtures.maven.MavenRepository
 import org.gradle.test.fixtures.server.http.HttpResource
 import org.gradle.test.fixtures.server.http.MavenHttpModule
 import org.gradle.test.fixtures.server.http.MavenHttpRepository
+import spock.lang.Ignore
 
 import static org.gradle.internal.resource.transport.http.JavaSystemPropertiesHttpTimeoutSettings.SOCKET_TIMEOUT_SYSTEM_PROPERTY
 
+@Ignore("Kotlin DEV")
 class DependencyUnresolvedModuleIntegrationTest extends AbstractHttpDependencyResolutionTest {
 
     private static final String GROUP_ID = 'group'

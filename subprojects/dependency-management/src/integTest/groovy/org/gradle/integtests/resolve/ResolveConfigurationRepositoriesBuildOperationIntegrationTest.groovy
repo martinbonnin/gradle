@@ -21,7 +21,9 @@ import org.gradle.integtests.fixtures.AbstractHttpDependencyResolutionTest
 import org.gradle.integtests.fixtures.BuildOperationNotificationsFixture
 import org.gradle.integtests.fixtures.BuildOperationsFixture
 import org.gradle.test.fixtures.plugin.PluginBuilder
+import spock.lang.Ignore
 
+@Ignore("Kotlin DEV")
 class ResolveConfigurationRepositoriesBuildOperationIntegrationTest extends AbstractHttpDependencyResolutionTest {
 
     def operations = new BuildOperationsFixture(executer, temporaryFolder)

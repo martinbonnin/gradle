@@ -19,8 +19,10 @@ import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.integtests.fixtures.TestResources
 import org.gradle.integtests.fixtures.ZincScalaCompileFixture
 import org.junit.Rule
+import spock.lang.Ignore
 import spock.lang.Issue
 
+@Ignore("Kotlin DEV")
 class IncrementalScalaCompileIntegrationTest extends AbstractIntegrationSpec {
 
     @Rule TestResources resources = new TestResources(temporaryFolder)

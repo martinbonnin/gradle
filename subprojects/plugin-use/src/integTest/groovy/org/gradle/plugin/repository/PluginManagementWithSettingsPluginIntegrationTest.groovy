@@ -23,8 +23,10 @@ import org.gradle.test.fixtures.maven.MavenFileRepository
 import org.gradle.test.fixtures.plugin.PluginBuilder
 import org.gradle.test.fixtures.server.http.MavenHttpPluginRepository
 import org.junit.Rule
+import spock.lang.Ignore
 import spock.lang.Issue
 
+@Ignore("Kotlin DEV")
 class PluginManagementWithSettingsPluginIntegrationTest extends AbstractIntegrationSpec {
     @Rule
     MavenHttpPluginRepository pluginPortal = MavenHttpPluginRepository.asGradlePluginPortal(executer, mavenRepo)
