@@ -30,6 +30,7 @@ import org.gradle.configurationcache.serialization.ReadContext
 import org.gradle.configurationcache.serialization.WriteContext
 import org.gradle.configurationcache.serialization.decodeBean
 import org.gradle.configurationcache.serialization.encodeBean
+import org.gradle.configurationcache.serialization.readNonNull
 import org.gradle.initialization.InitScript
 import org.gradle.initialization.SettingsScript
 import org.gradle.internal.metaobject.ConfigureDelegate
@@ -39,8 +40,10 @@ object ClosureCodec : Codec<Closure<*>> {
     override suspend fun WriteContext.encode(value: Closure<*>) {
         // Write the owning script for the closure
         // Discard the delegate, this will be replaced by the caller
-        writeReference(findOwningScript(value))
+        val owningScript = findOwningScript(value)
+        writeReference(owningScript)
         writeReference(value.thisObject)
+        writeReference(value.delegate)
         encodeBean(value.dehydrate())
     }
 
@@ -66,25 +69,29 @@ object ClosureCodec : Codec<Closure<*>> {
             is ProjectScript -> write(ClosureReference.Project)
             is SettingsScript -> write(ClosureReference.Settings)
             is InitScript -> write(ClosureReference.Init)
-            else -> write(ClosureReference.Other) // Discard the value for now
+            else -> {
+                write(ClosureReference.Other)
+                write(value)
+            }
         }
     }
 
     override suspend fun ReadContext.decode(): Closure<*> {
         val owner = readReference()
         val thisObject = readReference()
-        return (decodeBean() as Closure<*>).rehydrate(null, owner, thisObject)
+        val delegate = readReference()
+
+        return (decodeBean() as Closure<*>).rehydrate(delegate, owner ?: Any(), thisObject)
     }
 
     private
-    suspend fun ReadContext.readReference(): Any {
-        val reference = read()
+    suspend fun ReadContext.readReference(): Any? {
+        val reference = readNonNull<ClosureReference>()
         return when (reference) {
             ClosureReference.Project -> BrokenProjectScript(Project::class.java)
             ClosureReference.Settings -> BrokenProjectScript(Settings::class.java)
             ClosureReference.Init -> BrokenProjectScript(Gradle::class.java)
-            ClosureReference.Other -> Any()
-            else -> throw IllegalArgumentException()
+            ClosureReference.Other -> read()
         }
     }
 

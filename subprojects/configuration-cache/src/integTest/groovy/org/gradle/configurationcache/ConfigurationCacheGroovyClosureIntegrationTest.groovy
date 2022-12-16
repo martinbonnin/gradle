@@ -16,6 +16,10 @@
 
 package org.gradle.configurationcache
 
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
+
 class ConfigurationCacheGroovyClosureIntegrationTest extends AbstractConfigurationCacheIntegrationTest {
     def "from-cache build fails when task action closure reads a project property"() {
         given:
@@ -179,6 +183,71 @@ class ConfigurationCacheGroovyClosureIntegrationTest extends AbstractConfigurati
         failure.assertHasLineNumber(5)
         failure.assertHasFailure("Could not evaluate onlyIf predicate for task ':some'.") {
             // The cause is not reported
+        }
+    }
+
+    def "preserves delegate for Groovy closure defined outside of script"() {
+        given:
+        createDir("buildSrc") {
+            file("src/main/groovy/GroovyTask.groovy") << """
+                import ${DefaultTask.name}
+                import ${Internal.name}
+                import ${TaskAction.name}
+
+                class GroovyTask extends DefaultTask {
+                    @Internal
+                    List<Closure> actions = []
+
+                    void action() {
+                        actions.add { "Groovy closure in task with default delegate" }
+                    }
+
+                    void actionWithDelegate() {
+                        def action = { "Groovy closure in task with \$source" }
+                        action.delegate = new Bean()
+                        actions.add(action)
+                    }
+
+                    void actionWithChainedDelegate() {
+                        def cl = {
+                            delegate = new Bean()
+                            actions.add { "Nested Groovy closure in task with \$source" }
+                        }
+                        cl()
+                    }
+
+                    @TaskAction
+                    void run() {
+                        actions.forEach { action ->
+                            println "Greetings from " + action()
+                        }
+                    }
+                }
+                class Bean {
+                    final String source = "custom delegate"
+                }
+            """
+        }
+        buildFile """
+            task test(type: GroovyTask) {
+                action()
+                actionWithDelegate()
+                actionWithChainedDelegate()
+                actions.add { "Groovy closure in script with default delegate" }
+                def action = { "Groovy closure in script with \$source" }
+                action.delegate = new Bean()
+                actions.add(action)
+            }
+        """
+
+        expect:
+        2.times {
+            configurationCacheRun("test")
+            outputContains("Greetings from Groovy closure in task with default delegate")
+            outputContains("Greetings from Groovy closure in task with custom delegate")
+            outputContains("Greetings from Nested Groovy closure in task with custom delegate")
+            outputContains("Greetings from Groovy closure in script with default delegate")
+            outputContains("Greetings from Groovy closure in script with custom delegate")
         }
     }
 }
