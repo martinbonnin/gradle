@@ -20,6 +20,7 @@ import org.gradle.integtests.fixtures.ZincScalaCompileFixture
 import org.junit.Rule
 import spock.lang.Ignore
 
+@Ignore("Kotlin DEV")
 class ScalaProjectIntegrationTest extends AbstractIntegrationSpec {
     @Rule
     ZincScalaCompileFixture zincScalaCompileFixture = new ZincScalaCompileFixture(executer, testDirectoryProvider)

@@ -16,6 +16,8 @@
 
 package org.gradle.integtests.composite.plugins
 
+import spock.lang.Ignore
+
 class PluginBuildsIntegrationTest extends AbstractPluginBuildIntegrationTest {
 
     def "included plugin builds can contribute settings plugins"() {
@@ -289,6 +291,7 @@ class PluginBuildsIntegrationTest extends AbstractPluginBuildIntegrationTest {
         failureDescriptionContains("Plugin [id: '${pluginBuild.settingsPluginId}'] was not found in any of the following sources:")
     }
 
+    @Ignore("Kotlin DEV")
     def "included plugin build is not visible as library component"() {
         given:
         def build = pluginAndLibraryBuild("included-build")
