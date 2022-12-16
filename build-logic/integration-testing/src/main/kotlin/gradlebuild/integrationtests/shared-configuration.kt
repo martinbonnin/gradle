@@ -122,6 +122,7 @@ fun Project.createTasks(sourceSet: SourceSet, testType: TestType) {
     if (testType == TestType.INTEGRATION) {
         createTestTask(prefix + "ForceRealizeTest", defaultExecuter, sourceSet, testType) {
             systemProperties["org.gradle.integtest.force.realize.metadata"] = "true"
+            enabled = false // TODO Kotlin DEV
         }
     }
 }
