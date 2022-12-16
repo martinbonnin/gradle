@@ -77,11 +77,22 @@ public class BuildSourceBuilder {
         return buildOperationExecutor.call(new CallableBuildOperation<ClassPath>() {
             @Override
             public ClassPath call(BuildOperationContext context) {
-                ClassPath classPath = buildBuildSrc(buildSrcBuild);
-                // Once this build has finished, we are back in the configuration time:
-                configurationTimeBarrier.prepare();
+                boolean configurationTimeBarrierWasReadyToCross = configurationTimeBarrier.isReadyToCross();
+                ClassPath result;
+                try {
+                    /*
+                     * Right now, we don't want to track problems in buildSrc execution time,
+                     * so don't cross the configuration time barrier there;
+                     * Instead, we might want to handle the barrier in the same way as in normal builds
+                     * and after the buildSrc is built, set it back to configuration time with DefaultConfigurationTimeBarrier.prepare
+                     */
+                    configurationTimeBarrier.setReadyToCross(false);
+                    result = buildBuildSrc(buildSrcBuild);
+                } finally {
+                    configurationTimeBarrier.setReadyToCross(configurationTimeBarrierWasReadyToCross);
+                }
                 context.setResult(BUILD_BUILDSRC_RESULT);
-                return classPath;
+                return result;
             }
 
             @Override

@@ -19,16 +19,27 @@ package org.gradle.api.internal.provider;
 public class DefaultConfigurationTimeBarrier implements ConfigurationTimeBarrier {
 
     private volatile boolean atConfigurationTime = false;
+    private volatile boolean isReadyToCross = true;
 
     public void prepare() {
         atConfigurationTime = true;
     }
 
+    public void setReadyToCross(boolean readyToCross) {
+        isReadyToCross = readyToCross;
+    }
+
+    public boolean isReadyToCross() {
+        return isReadyToCross;
+    }
+
     public void cross() {
-        if (!atConfigurationTime) {
-            throw new IllegalStateException("Configuration time barrier can only be crossed once.");
+        if (isReadyToCross) {
+            if (!atConfigurationTime) {
+                throw new IllegalStateException("Configuration time barrier can only be crossed once.");
+            }
+            atConfigurationTime = false;
         }
-        atConfigurationTime = false;
     }
 
     @Override
