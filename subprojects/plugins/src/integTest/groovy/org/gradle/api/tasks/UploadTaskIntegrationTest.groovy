@@ -17,6 +17,7 @@
 package org.gradle.api.tasks
 
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
+import org.gradle.integtests.fixtures.ToBeFixedForConfigurationCache
 import org.gradle.util.GradleVersion
 
 /**
@@ -24,6 +25,7 @@ import org.gradle.util.GradleVersion
  and its properties accessed for backwards compatibility; but that it throws an exception upon usage.
  */
 class UploadTaskIntegrationTest extends AbstractIntegrationSpec {
+    @ToBeFixedForConfigurationCache(because = "Task.getProject() during execution (also, it is deprecated)")
     def "deprecated Upload task class can be registered and properties accessed, but fails at execution time"() {
         given:
         buildFile << """
