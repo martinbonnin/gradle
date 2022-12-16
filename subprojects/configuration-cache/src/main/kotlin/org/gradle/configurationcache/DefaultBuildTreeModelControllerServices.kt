@@ -147,10 +147,10 @@ class DefaultBuildTreeModelControllerServices : BuildTreeModelControllerServices
     ) {
         fun createTaskExecutionAccessChecker(
             configurationTimeBarrier: ConfigurationTimeBarrier,
-            configurationCacheStartParameter: ConfigurationCacheStartParameter
+            configurationCacheStartParameter: List<ConfigurationCacheStartParameter>
         ): TaskExecutionAccessChecker = when {
             !isConfigurationCacheEnabled -> TaskExecutionAccessCheckers.Noop
-            configurationCacheStartParameter.taskExecutionAccessPreStable -> TaskExecutionAccessCheckers.TaskStateBased
+            configurationCacheStartParameter.singleOrNull()?.taskExecutionAccessPreStable ?: false -> TaskExecutionAccessCheckers.TaskStateBased
             else -> TaskExecutionAccessCheckers.ConfigurationTimeBarrierBased(configurationTimeBarrier)
         }
     }
