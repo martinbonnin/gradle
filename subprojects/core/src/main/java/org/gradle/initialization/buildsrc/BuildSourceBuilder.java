@@ -17,7 +17,6 @@
 package org.gradle.initialization.buildsrc;
 
 import org.gradle.api.internal.GradleInternal;
-import org.gradle.api.internal.provider.DefaultConfigurationTimeBarrier;
 import org.gradle.cache.FileLock;
 import org.gradle.cache.FileLockManager;
 import org.gradle.cache.LockOptions;
@@ -48,24 +47,14 @@ public class BuildSourceBuilder {
     private final BuildSrcBuildListenerFactory buildSrcBuildListenerFactory;
     private final BuildStateRegistry buildRegistry;
     private final PublicBuildPath publicBuildPath;
-    private final DefaultConfigurationTimeBarrier configurationTimeBarrier;
 
-    public BuildSourceBuilder(
-        BuildState currentBuild,
-        FileLockManager fileLockManager,
-        BuildOperationExecutor buildOperationExecutor,
-        BuildSrcBuildListenerFactory buildSrcBuildListenerFactory,
-        BuildStateRegistry buildRegistry,
-        PublicBuildPath publicBuildPath,
-        DefaultConfigurationTimeBarrier configurationTimeBarrier
-    ) {
+    public BuildSourceBuilder(BuildState currentBuild, FileLockManager fileLockManager, BuildOperationExecutor buildOperationExecutor, BuildSrcBuildListenerFactory buildSrcBuildListenerFactory, BuildStateRegistry buildRegistry, PublicBuildPath publicBuildPath) {
         this.currentBuild = currentBuild;
         this.fileLockManager = fileLockManager;
         this.buildOperationExecutor = buildOperationExecutor;
         this.buildSrcBuildListenerFactory = buildSrcBuildListenerFactory;
         this.buildRegistry = buildRegistry;
         this.publicBuildPath = publicBuildPath;
-        this.configurationTimeBarrier = configurationTimeBarrier;
     }
 
     public ClassPath buildAndGetClassPath(GradleInternal gradle) {
@@ -78,8 +67,6 @@ public class BuildSourceBuilder {
             @Override
             public ClassPath call(BuildOperationContext context) {
                 ClassPath classPath = buildBuildSrc(buildSrcBuild);
-                // Once this build has finished, we are back in the configuration time:
-                configurationTimeBarrier.prepare();
                 context.setResult(BUILD_BUILDSRC_RESULT);
                 return classPath;
             }

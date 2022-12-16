@@ -16,7 +16,6 @@
 
 package org.gradle.configurationcache
 
-import org.gradle.api.internal.provider.DefaultConfigurationTimeBarrier
 import org.gradle.composite.internal.BuildTreeWorkGraphController
 import org.gradle.configurationcache.extensions.get
 import org.gradle.configurationcache.initialization.ConfigurationCacheStartParameter
@@ -44,10 +43,9 @@ class ConfigurationCacheBuildTreeLifecycleControllerFactory(
     private val eventListenerRegistry: BuildEventListenerRegistryInternal,
     private val startParameter: ConfigurationCacheStartParameter,
     private val buildStateRegistry: BuildStateRegistry,
-    private val configurationTimeBarrier: DefaultConfigurationTimeBarrier
 ) : BuildTreeLifecycleControllerFactory {
     private
-    val vintageFactory = VintageBuildTreeLifecycleControllerFactory(buildModelParameters, taskGraph, buildOperationExecutor, projectLeaseRegistry, stateTransitionControllerFactory, configurationTimeBarrier)
+    val vintageFactory = VintageBuildTreeLifecycleControllerFactory(buildModelParameters, taskGraph, buildOperationExecutor, projectLeaseRegistry, stateTransitionControllerFactory)
 
     override fun createRootBuildController(targetBuild: BuildLifecycleController, workExecutor: BuildTreeWorkExecutor, finishExecutor: BuildTreeFinishExecutor): BuildTreeLifecycleController {
         // Some temporary wiring: the cache implementation is still scoped to the root build rather than the build tree
@@ -77,6 +75,6 @@ class ConfigurationCacheBuildTreeLifecycleControllerFactory(
 
         val finisher = ConfigurationCacheAwareFinishExecutor(finishExecutor, cache)
 
-        return DefaultBuildTreeLifecycleController(targetBuild, workController, modelCreator, finisher, stateTransitionControllerFactory, configurationTimeBarrier)
+        return DefaultBuildTreeLifecycleController(targetBuild, workController, modelCreator, finisher, stateTransitionControllerFactory)
     }
 }

@@ -16,7 +16,6 @@
 
 package org.gradle.configurationcache
 
-import org.gradle.api.internal.provider.DefaultConfigurationTimeBarrier
 import org.gradle.composite.internal.BuildTreeWorkGraphController
 import org.gradle.execution.EntryTaskSelector
 import org.gradle.internal.build.ExecutionResult
@@ -29,14 +28,12 @@ import org.gradle.internal.buildtree.BuildTreeWorkPreparer
 class VintageBuildTreeWorkController(
     private val workPreparer: BuildTreeWorkPreparer,
     private val workExecutor: BuildTreeWorkExecutor,
-    private val taskGraph: BuildTreeWorkGraphController,
-    private val configurationTimeBarrier: DefaultConfigurationTimeBarrier
+    private val taskGraph: BuildTreeWorkGraphController
 ) : BuildTreeWorkController {
 
     override fun scheduleAndRunRequestedTasks(taskSelector: EntryTaskSelector?): ExecutionResult<Void> {
         return taskGraph.withNewWorkGraph { graph: BuildTreeWorkGraph ->
             val finalizedGraph: BuildTreeWorkGraph.FinalizedGraph = workPreparer.scheduleRequestedTasks(graph, taskSelector)
-            configurationTimeBarrier.cross()
             workExecutor.execute(finalizedGraph)
         }
     }

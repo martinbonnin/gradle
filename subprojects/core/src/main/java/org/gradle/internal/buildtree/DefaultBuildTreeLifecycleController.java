@@ -17,7 +17,6 @@ package org.gradle.internal.buildtree;
 
 import org.gradle.api.internal.GradleInternal;
 import org.gradle.api.internal.SettingsInternal;
-import org.gradle.api.internal.provider.DefaultConfigurationTimeBarrier;
 import org.gradle.execution.EntryTaskSelector;
 import org.gradle.internal.Describables;
 import org.gradle.internal.build.BuildLifecycleController;
@@ -39,22 +38,19 @@ public class DefaultBuildTreeLifecycleController implements BuildTreeLifecycleCo
     private final BuildTreeModelCreator modelCreator;
     private final BuildTreeFinishExecutor finishExecutor;
     private final StateTransitionController<State> state;
-    private final DefaultConfigurationTimeBarrier configurationTimeBarrier;
 
     public DefaultBuildTreeLifecycleController(
         BuildLifecycleController buildLifecycleController,
         BuildTreeWorkController workController,
         BuildTreeModelCreator modelCreator,
         BuildTreeFinishExecutor finishExecutor,
-        StateTransitionControllerFactory controllerFactory,
-        DefaultConfigurationTimeBarrier configurationTimeBarrier
+        StateTransitionControllerFactory controllerFactory
     ) {
         this.buildLifecycleController = buildLifecycleController;
         this.workController = workController;
         this.modelCreator = modelCreator;
         this.finishExecutor = finishExecutor;
         this.state = controllerFactory.newController(Describables.of("build tree state"), State.NotStarted);
-        this.configurationTimeBarrier = configurationTimeBarrier;
     }
 
     @Override
@@ -69,7 +65,6 @@ public class DefaultBuildTreeLifecycleController implements BuildTreeLifecycleCo
 
     @Override
     public void scheduleAndRunTasks(EntryTaskSelector selector) {
-        configurationTimeBarrier.prepare();
         runBuild(() -> workController.scheduleAndRunRequestedTasks(selector));
     }
 

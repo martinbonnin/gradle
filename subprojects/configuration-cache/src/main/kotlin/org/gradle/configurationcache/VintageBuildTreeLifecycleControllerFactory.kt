@@ -16,7 +16,6 @@
 
 package org.gradle.configurationcache
 
-import org.gradle.api.internal.provider.DefaultConfigurationTimeBarrier
 import org.gradle.composite.internal.BuildTreeWorkGraphController
 import org.gradle.internal.build.BuildLifecycleController
 import org.gradle.internal.buildtree.BuildModelParameters
@@ -37,8 +36,7 @@ class VintageBuildTreeLifecycleControllerFactory(
     private val taskGraph: BuildTreeWorkGraphController,
     private val buildOperationExecutor: BuildOperationExecutor,
     private val projectLeaseRegistry: ProjectLeaseRegistry,
-    private val stateTransitionControllerFactory: StateTransitionControllerFactory,
-    private val configurationTimeBarrier: DefaultConfigurationTimeBarrier
+    private val stateTransitionControllerFactory: StateTransitionControllerFactory
 ) : BuildTreeLifecycleControllerFactory {
     // Used when CC is not enabled
     override fun createRootBuildController(targetBuild: BuildLifecycleController, workExecutor: BuildTreeWorkExecutor, finishExecutor: BuildTreeFinishExecutor): BuildTreeLifecycleController {
@@ -49,12 +47,12 @@ class VintageBuildTreeLifecycleControllerFactory(
     override fun createController(targetBuild: BuildLifecycleController, workExecutor: BuildTreeWorkExecutor, finishExecutor: BuildTreeFinishExecutor): BuildTreeLifecycleController {
         val workPreparer = createWorkPreparer(targetBuild)
         val modelCreator = createModelCreator(targetBuild)
-        val workController = VintageBuildTreeWorkController(workPreparer, workExecutor, taskGraph, configurationTimeBarrier)
-        return DefaultBuildTreeLifecycleController(targetBuild, workController, modelCreator, finishExecutor, stateTransitionControllerFactory, configurationTimeBarrier)
+        val workController = VintageBuildTreeWorkController(workPreparer, workExecutor, taskGraph)
+        return DefaultBuildTreeLifecycleController(targetBuild, workController, modelCreator, finishExecutor, stateTransitionControllerFactory)
     }
 
     fun createModelCreator(targetBuild: BuildLifecycleController) =
-        DefaultBuildTreeModelCreator(buildModelParameters, targetBuild.gradle.owner, buildOperationExecutor, projectLeaseRegistry, configurationTimeBarrier)
+        DefaultBuildTreeModelCreator(buildModelParameters, targetBuild.gradle.owner, buildOperationExecutor, projectLeaseRegistry)
 
     fun createWorkPreparer(targetBuild: BuildLifecycleController) = DefaultBuildTreeWorkPreparer(targetBuild.gradle.owner, targetBuild)
 }

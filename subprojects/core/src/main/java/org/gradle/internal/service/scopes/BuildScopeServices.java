@@ -59,7 +59,6 @@ import org.gradle.api.internal.project.taskfactory.ITaskFactory;
 import org.gradle.api.internal.project.taskfactory.TaskClassInfoStore;
 import org.gradle.api.internal.project.taskfactory.TaskFactory;
 import org.gradle.api.internal.properties.GradleProperties;
-import org.gradle.api.internal.provider.DefaultConfigurationTimeBarrier;
 import org.gradle.api.internal.provider.DefaultProviderFactory;
 import org.gradle.api.internal.provider.DefaultValueSourceProviderFactory;
 import org.gradle.api.internal.provider.ValueSourceProviderFactory;
@@ -462,17 +461,7 @@ public class BuildScopeServices extends DefaultServiceRegistry {
             get(CompileOperationFactory.class));
     }
 
-    protected BuildSourceBuilder createBuildSourceBuilder(
-        BuildState currentBuild,
-        FileLockManager fileLockManager,
-        BuildOperationExecutor buildOperationExecutor,
-        CachedClasspathTransformer cachedClasspathTransformer,
-        CachingServiceLocator cachingServiceLocator,
-        BuildStateRegistry buildRegistry,
-        PublicBuildPath publicBuildPath,
-        NamedObjectInstantiator instantiator,
-        DefaultConfigurationTimeBarrier configurationTimeBarrier
-    ) {
+    protected BuildSourceBuilder createBuildSourceBuilder(BuildState currentBuild, FileLockManager fileLockManager, BuildOperationExecutor buildOperationExecutor, CachedClasspathTransformer cachedClasspathTransformer, CachingServiceLocator cachingServiceLocator, BuildStateRegistry buildRegistry, PublicBuildPath publicBuildPath, NamedObjectInstantiator instantiator) {
         return new BuildSourceBuilder(
             currentBuild,
             fileLockManager,
@@ -484,9 +473,7 @@ public class BuildScopeServices extends DefaultServiceRegistry {
                 instantiator,
                 cachedClasspathTransformer),
             buildRegistry,
-            publicBuildPath,
-            configurationTimeBarrier
-        );
+            publicBuildPath);
     }
 
     protected InitScriptHandler createInitScriptHandler(ScriptPluginFactory scriptPluginFactory, ScriptHandlerFactory scriptHandlerFactory, BuildOperationExecutor buildOperationExecutor, TextFileResourceLoader resourceLoader) {
