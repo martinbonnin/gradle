@@ -129,8 +129,9 @@ task verify {
 
             task assertDirectoriesAreEquals {
                 def mainGroovySourceDirSet = sourceSets.main.groovy
+                def compileGroovyDestinationDir = compileGroovy.destinationDirectory
                 doLast {
-                    assert mainGroovySourceDirSet.destinationDirectory.get().asFile == compileGroovy.destinationDirectory.get().asFile
+                    assert mainGroovySourceDirSet.destinationDirectory.get().asFile == compileGroovyDestinationDir.get().asFile
                     assert mainGroovySourceDirSet.destinationDirectory.get().asFile == file("$buildDir/bin")
                 }
             }

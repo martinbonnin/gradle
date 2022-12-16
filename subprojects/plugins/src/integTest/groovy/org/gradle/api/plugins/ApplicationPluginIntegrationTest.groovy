@@ -423,8 +423,9 @@ dependencies {
             }
 
             task printTestClasspath {
+                def testClasspath = test.classpath
                 doLast {
-                    println test.classpath.collect{ it.name }.join(',')
+                    println testClasspath.collect{ it.name }.join(',')
                 }
             }
 
