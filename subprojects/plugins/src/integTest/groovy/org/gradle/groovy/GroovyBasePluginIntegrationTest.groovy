@@ -38,9 +38,11 @@ task groovydoc(type: Groovydoc) {
 }
 
 task verify {
+    def compileCustomGroovyClasspath = compileCustomGroovy.groovyClasspath
+    def groovydocGroovyClasspath = groovydoc.groovyClasspath
     doLast {
-        assert compileCustomGroovy.groovyClasspath.files.any { it.name == "$jarFile" }
-        assert groovydoc.groovyClasspath.files.any { it.name == "$jarFile" }
+        assert compileCustomGroovyClasspath.files.any { it.name == "$jarFile" }
+        assert groovydocGroovyClasspath.files.any { it.name == "$jarFile" }
     }
 }
 """
@@ -126,9 +128,10 @@ task verify {
             }
 
             task assertDirectoriesAreEquals {
+                def mainGroovySourceDirSet = sourceSets.main.groovy
                 doLast {
-                    assert sourceSets.main.groovy.destinationDirectory.get().asFile == compileGroovy.destinationDirectory.get().asFile
-                    assert sourceSets.main.groovy.destinationDirectory.get().asFile == file("$buildDir/bin")
+                    assert mainGroovySourceDirSet.destinationDirectory.get().asFile == compileGroovy.destinationDirectory.get().asFile
+                    assert mainGroovySourceDirSet.destinationDirectory.get().asFile == file("$buildDir/bin")
                 }
             }
         '''
