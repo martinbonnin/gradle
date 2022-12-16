@@ -48,9 +48,6 @@ abstract class AbstractTaskProjectAccessChecker : TaskExecutionAccessChecker {
 
 
 object TaskExecutionAccessCheckers {
-    object Noop : AbstractTaskProjectAccessChecker() {
-        override fun shouldReportExecutionTimeAccess(task: TaskInternal): Boolean = false
-    }
 
     object TaskStateBased : AbstractTaskProjectAccessChecker() {
         override fun shouldReportExecutionTimeAccess(task: TaskInternal): Boolean = task.state.executing
