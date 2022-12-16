@@ -19,6 +19,7 @@ package org.gradle.connectivity
 import org.gradle.integtests.fixtures.AbstractDependencyResolutionTest
 import org.gradle.util.Requires
 import org.gradle.util.TestPrecondition
+import spock.lang.Ignore
 
 @Requires(TestPrecondition.ONLINE)
 class MavenGoogleDependencyResolveIntegrationTest extends AbstractDependencyResolutionTest {
@@ -37,6 +38,7 @@ class MavenGoogleDependencyResolveIntegrationTest extends AbstractDependencyReso
         """
     }
 
+    @Ignore("Kotlin DEV")
     def "can query for human-readable repository name"() {
         given:
         buildFile << """
@@ -58,11 +60,11 @@ class MavenGoogleDependencyResolveIntegrationTest extends AbstractDependencyReso
             configurations {
                 compile
             }
-            
+
             dependencies {
                 compile '$dependencyGav'
             }
-            
+
             task copyLibs(type: Copy) {
                 from configurations.compile
                 into "\$buildDir/libs"

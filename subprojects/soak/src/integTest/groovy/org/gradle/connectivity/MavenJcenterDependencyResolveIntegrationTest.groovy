@@ -18,9 +18,11 @@ package org.gradle.connectivity
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.util.Requires
 import org.gradle.util.TestPrecondition
+import spock.lang.Ignore
 
 @Requires(TestPrecondition.ONLINE)
 class MavenJcenterDependencyResolveIntegrationTest extends AbstractIntegrationSpec {
+    @Ignore("Kotlin DEV")
     def "resolves a minimal dependency from bintray's jcenter"() {
         given:
         executer.expectDeprecationWarning("The RepositoryHandler.jcenter() method has been deprecated.")

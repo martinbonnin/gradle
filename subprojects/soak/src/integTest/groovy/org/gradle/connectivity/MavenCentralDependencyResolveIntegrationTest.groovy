@@ -18,9 +18,11 @@ package org.gradle.connectivity
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.util.Requires
 import org.gradle.util.TestPrecondition
+import spock.lang.Ignore
 
 @Requires(TestPrecondition.ONLINE)
 class MavenCentralDependencyResolveIntegrationTest extends AbstractIntegrationSpec {
+    @Ignore("Kotlin DEV")
     def "resolves a minimal dependency from Maven Central"() {
         given:
         buildFile << """

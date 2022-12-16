@@ -22,7 +22,9 @@ import org.gradle.integtests.tooling.fixture.TargetGradleVersion
 import org.gradle.test.fixtures.Flaky
 import org.gradle.tooling.ProjectConnection
 import org.gradle.util.GradleVersion
+import spock.lang.Ignore
 
+@Ignore("Kotlin DEV")
 class ArtifactDownloadProgressCrossVersionSpec extends AbstractHttpCrossVersionSpec {
     @Flaky(because = "https://github.com/gradle/gradle-private/issues/3638")
     @TargetGradleVersion(">=5.7")
