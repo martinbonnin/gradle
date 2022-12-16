@@ -238,6 +238,7 @@ class BuildDashboardPluginIntegrationTest extends WellBehavedPluginTest {
         !buildDashboardFile.exists()
     }
 
+    @ToBeFixedForConfigurationCache(because = ":buildDashboard")
     void 'dashboard is not generated if it is disabled'() {
         given:
         goodCode()
