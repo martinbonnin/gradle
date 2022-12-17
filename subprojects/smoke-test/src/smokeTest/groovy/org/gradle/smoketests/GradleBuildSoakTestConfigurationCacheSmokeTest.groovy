@@ -23,8 +23,6 @@ class GradleBuildSoakTestConfigurationCacheSmokeTest extends AbstractGradleBuild
 
         given:
         def tasks = [
-            // TODO: the version of KGP we use still accesses Task.project from a cacheIf predicate
-            "-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true",
             ':soak:forkingIntegTest',
             '--tests=org.gradle.connectivity.MavenCentralDependencyResolveIntegrationTest'
         ]

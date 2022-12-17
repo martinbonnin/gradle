@@ -23,8 +23,6 @@ class GradleBuildIntegTestConfigurationCacheSmokeTest extends AbstractGradleBuil
 
         given: "tasks whose configuration can only be loaded in the original daemon"
         def supportedTasks = [
-            // TODO: the version of KGP we use still accesses Task.project from a cacheIf predicate
-            "-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true",
             ":configuration-cache:embeddedIntegTest",
             "--tests=org.gradle.configurationcache.ConfigurationCacheDebugLogIntegrationTest"
         ]
