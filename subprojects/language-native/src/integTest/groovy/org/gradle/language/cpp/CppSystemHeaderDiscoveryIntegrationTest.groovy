@@ -25,10 +25,9 @@ class CppSystemHeaderDiscoveryIntegrationTest extends AbstractInstalledToolChain
         buildFile << """
             plugins { id 'cpp-application' }
             task sysHeaders {
-                def systemIncludes = tasks.compileDebugCpp.systemIncludes
                 doLast {
                     def out = file("${outputFile.toURI()}")
-                    out.text = systemIncludes.join('\\n')
+                    out.text = tasks.compileDebugCpp.systemIncludes.join('\\n')
                 }
             }
         """
