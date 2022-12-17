@@ -35,7 +35,7 @@ class GradleBuildSmokeTest extends AbstractGradleceptionSmokeTest {
         ])
 
         when:
-        runner.build()
+        result = runner.build()
 
         then:
         result.task(":distributions-full:binDistributionZip").outcome == TaskOutcome.SUCCESS
