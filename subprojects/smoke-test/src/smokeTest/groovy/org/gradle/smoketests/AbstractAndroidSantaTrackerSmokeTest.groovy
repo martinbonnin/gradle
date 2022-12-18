@@ -78,8 +78,7 @@ class AbstractAndroidSantaTrackerSmokeTest extends AbstractSmokeTest {
             "-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true",
             "-DagpVersion=$agpVersion",
             "-DkotlinVersion=$kotlinVersion",
-            "--stacktrace",
-            "--debug"],
+            "--stacktrace"],
         tasks].flatten()
         if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_16)) {
             // fall back to using Java 11 (LTS) for Android tests
