@@ -182,7 +182,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 
@@ -288,7 +288,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 
@@ -392,7 +392,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 
@@ -473,7 +473,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         succeeds ':help'
 
@@ -721,7 +721,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 
@@ -811,7 +811,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 
@@ -1287,7 +1287,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 
@@ -1307,7 +1307,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 
@@ -1345,7 +1345,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help", "--offline"
 
@@ -1394,7 +1394,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 
@@ -1437,7 +1437,7 @@ class DependencyVerificationWritingIntegTest extends AbstractDependencyVerificat
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         run ":help"
 

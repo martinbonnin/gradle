@@ -49,7 +49,7 @@ class DependencyVerificationSignatureWriteIntegTest extends AbstractSignatureVer
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         succeeds ":help"
 
@@ -93,7 +93,7 @@ class DependencyVerificationSignatureWriteIntegTest extends AbstractSignatureVer
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         succeeds ":help"
 
@@ -154,7 +154,7 @@ class DependencyVerificationSignatureWriteIntegTest extends AbstractSignatureVer
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         succeeds ":help"
 
@@ -260,7 +260,7 @@ class DependencyVerificationSignatureWriteIntegTest extends AbstractSignatureVer
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         succeeds ":help"
 
@@ -315,7 +315,7 @@ class DependencyVerificationSignatureWriteIntegTest extends AbstractSignatureVer
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         succeeds ":help", "--export-keys"
 
@@ -426,7 +426,7 @@ class DependencyVerificationSignatureWriteIntegTest extends AbstractSignatureVer
         writeVerificationMetadata()
 
         //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
-        executer.withArguments("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
 
         succeeds ":help", "--export-keys"
 
@@ -456,6 +456,9 @@ class DependencyVerificationSignatureWriteIntegTest extends AbstractSignatureVer
         """
 
         when:
+        //TODO: remove this once dependency verification stops triggering dependency resolution at execution time
+        executer.withBuildJvmOpts("-Dorg.gradle.configuration-cache.internal.task-execution-access-pre-stable=true")
+
         serveValidKey()
         keyServerFixture.registerPublicKey(keyring.publicKey)
         succeeds "build", "--export-keys"
