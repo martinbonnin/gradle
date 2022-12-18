@@ -68,9 +68,8 @@ project('query') {
 
 project('resolve') {
     task resolve {
-        def compileClasspath = configurations.compileClasspath
         doLast {
-            compileClasspath.files.collect { it.file }
+            configurations.compileClasspath.files.collect { it.file }
         }
     }
 }
@@ -109,10 +108,9 @@ project('resolve') {
                 implementation 'group:artifact:1.0'
             }
             task query {
-                def compileClasspath = configurations.compileClasspath
                 doLast {
-                    assert compileClasspath.files
-                    def id = compileClasspath.incoming.resolutionResult
+                    assert configurations.compileClasspath.files
+                    def id = configurations.compileClasspath.incoming.resolutionResult
                         .allDependencies.first().selected.id
                     dependencies.createArtifactResolutionQuery()
                         .forComponents(id)
