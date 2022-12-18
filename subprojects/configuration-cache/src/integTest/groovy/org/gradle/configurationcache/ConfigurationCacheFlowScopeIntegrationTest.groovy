@@ -20,24 +20,24 @@ import org.gradle.test.fixtures.file.TestFile
 
 class ConfigurationCacheFlowScopeIntegrationTest extends AbstractConfigurationCacheIntegrationTest {
 
-    def '#target plugin can react to task execution result'() {
+    def '#target plugin with #parameter can react to task execution result'() {
         given:
         def configCache = newConfigurationCacheFixture()
 
         and:
-        withLavaLampPluginFor target
+        withLavaLampPluginFor target, parameter
 
         when: 'task runs successfully'
         configurationCacheRun 'help'
 
-        then: 'flow action receives build result'
+        then: 'flow action reacts to build result'
         configCache.assertStateStored(true)
         outputContains '(green)'
 
         when: 'task from cache runs successfully'
         configurationCacheRun 'help'
 
-        then: 'flow action receives build result'
+        then: 'flow action reacts to build result'
         configCache.assertStateLoaded()
         outputContains '(green)'
 
@@ -49,26 +49,26 @@ class ConfigurationCacheFlowScopeIntegrationTest extends AbstractConfigurationCa
         '''
         configurationCacheFails 'fail'
 
-        then: 'flow action receives build failure'
+        then: 'flow action reacts to build failure'
         outputContains '(red)'
         configCache.assertStateStored()
 
         when: 'task from cache fails'
         configurationCacheFails 'fail'
 
-        then: 'flow action receives build failure'
+        then: 'flow action reacts to build failure'
         outputContains '(red)'
         configCache.assertStateLoaded()
 
         where:
-        target << ScriptTarget.values()
+        [target, parameter] << [ScriptTarget.values(), ParameterKind.values()].combinations()
     }
 
-    def '#target plugin can react to configuration failure'() {
+    def '#target plugin with #parameter can react to configuration failure'() {
         given:
-        withLavaLampPluginFor target
+        withLavaLampPluginFor target, parameter
 
-        and:
+        and: 'it fails at configuration time'
         buildFile '''
             assert false
         '''
@@ -76,16 +76,37 @@ class ConfigurationCacheFlowScopeIntegrationTest extends AbstractConfigurationCa
         when:
         configurationCacheFails 'help'
 
-        then:
+        then: 'flow action reacts to build failure'
         outputContains '(red)'
 
         where:
-        target << ScriptTarget.values()
+        [target, parameter] << [ScriptTarget.values(), ParameterKind.values()].combinations()
+    }
+
+    void withLavaLampPluginFor(ScriptTarget target, ParameterKind parameter) {
+        switch (parameter) {
+            case ParameterKind.SIMPLE: {
+                withSimpleLavaLampPluginFor target
+                break
+            }
+            case ParameterKind.BUILD_SERVICE: {
+                withLavaLampServicePluginFor target, false
+                break
+            }
+            case ParameterKind.ANNOTATED_BUILD_SERVICE: {
+                withLavaLampServicePluginFor target, true
+                break
+            }
+        }
     }
 
     enum ScriptTarget {
-        PROJECT,
-        SETTINGS;
+        SETTINGS,
+        PROJECT;
+
+        String getFileName() {
+            this == SETTINGS ? 'settings.gradle' : 'build.gradle'
+        }
 
         String getTargetType() {
             toString().capitalize()
@@ -97,7 +118,18 @@ class ConfigurationCacheFlowScopeIntegrationTest extends AbstractConfigurationCa
         }
     }
 
-    private withLavaLampPluginFor(ScriptTarget target) {
+    enum ParameterKind {
+        SIMPLE,
+        BUILD_SERVICE,
+        ANNOTATED_BUILD_SERVICE;
+
+        @Override
+        String toString() {
+            "${name().toLowerCase().replace('_', ' ')} parameter"
+        }
+    }
+
+    private withSimpleLavaLampPluginFor(ScriptTarget target) {
         def targetType = target.targetType
         scriptFileFor(target) << """
             import org.gradle.api.flow.*
@@ -137,7 +169,61 @@ class ConfigurationCacheFlowScopeIntegrationTest extends AbstractConfigurationCa
         """
     }
 
+    private withLavaLampServicePluginFor(ScriptTarget target, Boolean annotated) {
+        def targetType = target.targetType
+        scriptFileFor(target) << """
+            import org.gradle.api.flow.*
+            import org.gradle.api.services.*
+
+            class BuildServicePlugin implements Plugin<$targetType> {
+
+                final FlowScope flowScope
+                final FlowProviders flowProviders
+
+                @Inject
+                BuildServicePlugin(FlowScope flowScope, FlowProviders flowProviders) {
+                    this.flowScope = flowScope
+                    this.flowProviders = flowProviders
+                }
+
+                void apply($targetType target) {
+                    def lamp = target.gradle.sharedServices.registerIfAbsent('lamp', LavaLamp) {}
+                    flowScope.always(SetLavaLampColor) {
+                        // TODO: annotated property shouldn't require assignment
+                        // ${annotated ? '' : 'parameters.lamp = lamp'}
+                        parameters.lamp = lamp
+                        parameters.color = flowProviders.requestedTasksResult.map {
+                            it.failure.present ? 'red' : 'green'
+                        }
+                    }
+                }
+            }
+
+            class SetLavaLampColor implements FlowAction<Parameters> {
+
+                interface Parameters extends FlowParameters {
+                    ${annotated ? '@ServiceReference("lamp")' : ''} Property<LavaLamp> getLamp()
+                    @Input Property<String> getColor()
+                }
+
+                void execute(Parameters parameters) {
+                    parameters.with {
+                        lamp.get().setColor(color.get())
+                    }
+                }
+            }
+
+            abstract class LavaLamp implements BuildService<BuildServiceParameters.None> {
+                void setColor(String color) {
+                    println('(' + color + ')')
+                }
+            }
+
+            apply type: BuildServicePlugin
+        """
+    }
+
     private TestFile scriptFileFor(ScriptTarget target) {
-        file(target == ScriptTarget.PROJECT ? 'build.gradle' : 'settings.gradle')
+        file(target.fileName)
     }
 }
