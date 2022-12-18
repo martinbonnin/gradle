@@ -102,7 +102,7 @@ public abstract class AbstractCopyTask extends ConventionTask implements CopySpe
     }
 
     protected CopySpecInternal createRootSpec() {
-        return getProjectUnchecked().getObjects().newInstance(DefaultCopySpec.class);
+        return getProject().getObjects().newInstance(DefaultCopySpec.class);
     }
 
     protected abstract CopyAction createCopyAction();

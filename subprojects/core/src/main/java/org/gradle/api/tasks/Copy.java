@@ -80,7 +80,7 @@ public abstract class Copy extends AbstractCopyTask {
 
     @Override
     protected CopySpecInternal createRootSpec() {
-        return getProjectUnchecked().getObjects().newInstance(DestinationRootCopySpec.class, super.createRootSpec());
+        return getProject().getObjects().newInstance(DestinationRootCopySpec.class, super.createRootSpec());
     }
 
     @Override

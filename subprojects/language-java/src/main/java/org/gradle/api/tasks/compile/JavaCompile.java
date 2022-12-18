@@ -93,7 +93,7 @@ import static com.google.common.base.Preconditions.checkState;
 @CacheableTask
 public abstract class JavaCompile extends AbstractCompile implements HasCompileOptions {
     private final CompileOptions compileOptions;
-    private final FileCollection stableSources = getProjectUnchecked().files((Callable<FileTree>) this::getSource);
+    private final FileCollection stableSources = getProject().files((Callable<FileTree>) this::getSource);
     private final ModularitySpec modularity;
     private File previousCompilationDataFile;
     private final Property<JavaCompiler> javaCompiler;
