@@ -16,14 +16,93 @@
 
 package org.gradle.configurationcache
 
+import org.gradle.test.fixtures.file.TestFile
+
 class ConfigurationCacheFlowScopeIntegrationTest extends AbstractConfigurationCacheIntegrationTest {
 
-    def 'project plugin can receive build result'() {
+    def '#target plugin can react to task execution result'() {
         given:
+        def configCache = newConfigurationCacheFixture()
+
+        and:
+        withLavaLampPluginFor target
+
+        when: 'task runs successfully'
+        configurationCacheRun 'help'
+
+        then: 'flow action receives build result'
+        configCache.assertStateStored(true)
+        outputContains '(green)'
+
+        when: 'task from cache runs successfully'
+        configurationCacheRun 'help'
+
+        then: 'flow action receives build result'
+        configCache.assertStateLoaded()
+        outputContains '(green)'
+
+        when: 'task fails'
         buildFile '''
+            tasks.register('fail') {
+                doLast { assert false }
+            }
+        '''
+        configurationCacheFails 'fail'
+
+        then: 'flow action receives build failure'
+        outputContains '(red)'
+        configCache.assertStateStored()
+
+        when: 'task from cache fails'
+        configurationCacheFails 'fail'
+
+        then: 'flow action receives build failure'
+        outputContains '(red)'
+        configCache.assertStateLoaded()
+
+        where:
+        target << ScriptTarget.values()
+    }
+
+    def '#target plugin can react to configuration failure'() {
+        given:
+        withLavaLampPluginFor target
+
+        and:
+        buildFile '''
+            assert false
+        '''
+
+        when:
+        configurationCacheFails 'help'
+
+        then:
+        outputContains '(red)'
+
+        where:
+        target << ScriptTarget.values()
+    }
+
+    enum ScriptTarget {
+        PROJECT,
+        SETTINGS;
+
+        String getTargetType() {
+            toString().capitalize()
+        }
+
+        @Override
+        String toString() {
+            name().toLowerCase()
+        }
+    }
+
+    private withLavaLampPluginFor(ScriptTarget target) {
+        def targetType = target.targetType
+        scriptFileFor(target) << """
             import org.gradle.api.flow.*
 
-            class LavaLampPlugin implements Plugin<Project> {
+            class LavaLampPlugin implements Plugin<$targetType> {
 
                 final FlowScope flowScope
                 final FlowProviders flowProviders
@@ -34,7 +113,7 @@ class ConfigurationCacheFlowScopeIntegrationTest extends AbstractConfigurationCa
                     this.flowProviders = flowProviders
                 }
 
-                void apply(Project target) {
+                void apply($targetType target) {
                     flowScope.always(SetLavaLampColor) {
                         parameters.color = flowProviders.requestedTasksResult.map {
                             it.failure.present ? 'red' : 'green'
@@ -50,45 +129,15 @@ class ConfigurationCacheFlowScopeIntegrationTest extends AbstractConfigurationCa
                 }
 
                 void execute(Parameters parameters) {
-                    println "(${parameters.color.get()})"
+                    println "(${'$'}{parameters.color.get()})"
                 }
             }
 
             apply type: LavaLampPlugin
-        '''
-        def configCache = newConfigurationCacheFixture()
+        """
+    }
 
-        when:
-        configurationCacheRun 'help'
-
-        then:
-        configCache.assertStateStored(true)
-        outputContains '(green)'
-
-        when:
-        configurationCacheRun 'help'
-
-        then:
-        configCache.assertStateLoaded()
-        outputContains '(green)'
-
-        when:
-        buildFile '''
-            tasks.register('fail') {
-                doLast { assert false }
-            }
-        '''
-        configurationCacheFails 'fail'
-
-        then:
-        outputContains '(red)'
-        configCache.assertStateStored()
-
-        when:
-        configurationCacheFails 'fail'
-
-        then:
-        outputContains '(red)'
-        configCache.assertStateLoaded()
+    private TestFile scriptFileFor(ScriptTarget target) {
+        file(target == ScriptTarget.PROJECT ? 'build.gradle' : 'settings.gradle')
     }
 }

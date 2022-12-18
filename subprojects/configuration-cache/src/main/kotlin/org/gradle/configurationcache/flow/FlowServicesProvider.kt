@@ -19,6 +19,7 @@ package org.gradle.configurationcache.flow
 import org.gradle.api.flow.FlowProviders
 import org.gradle.api.flow.FlowScope
 import org.gradle.api.model.ObjectFactory
+import org.gradle.internal.event.ListenerManager
 import org.gradle.internal.instantiation.InstantiatorFactory
 import org.gradle.internal.service.ServiceRegistry
 
@@ -27,17 +28,33 @@ internal
 object FlowServicesProvider {
 
     private
-    fun createFlowProvider(): FlowProviders =
+    fun createFlowProviders(): FlowProviders =
         DefaultFlowProviders()
 
     private
     fun createBuildFlowScope(
         objectFactory: ObjectFactory,
+        flowScheduler: FlowScheduler,
+        flowProviders: FlowProviders,
         instantiatorFactory: InstantiatorFactory,
-        services: ServiceRegistry
+        services: ServiceRegistry,
+        listenerManager: ListenerManager,
     ): FlowScope = objectFactory.newInstance(
         BuildFlowScope::class.java,
+        flowScheduler,
+        flowProviders,
         instantiatorFactory,
         services
+    ).also {
+        listenerManager.addListener(it)
+    }
+
+    private
+    fun createFlowScheduler(
+        instantiatorFactory: InstantiatorFactory,
+        services: ServiceRegistry,
+    ): FlowScheduler = FlowScheduler(
+        instantiatorFactory,
+        services,
     )
 }

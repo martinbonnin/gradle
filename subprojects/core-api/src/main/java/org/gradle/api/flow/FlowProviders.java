@@ -36,8 +36,9 @@ public interface FlowProviders {
      * Returns a {@link Provider provider} for the summary of the result of executing the
      * {@link StartParameter#getTaskRequests() requested tasks}.
      *
-     * The returned {@link Provider#get() provider's value} only becomes available after all requested tasks
-     * have completed.
+     * The returned {@link Provider#get() provider's value} becomes available after all requested tasks
+     * have completed - successfully or otherwise - or after a configuration phase failure prevents the execution
+     * of the requested tasks.
      *
      * <pre class='autoTested'>
      * /**
