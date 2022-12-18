@@ -200,7 +200,7 @@ public class DefaultBuildLifecycleController implements BuildLifecycleController
             ExecutionResult<Void> finishResult;
             try {
                 buildListener.buildFinished(buildResult);
-                buildFinishedListener.buildFinished((GradleInternal) buildResult.getGradle(), buildResult.getFailure() != null);
+                buildFinishedListener.buildFinished((GradleInternal) buildResult.getGradle(), buildResult.getFailure());
                 finishResult = ExecutionResult.succeeded();
             } catch (Throwable t) {
                 finishResult = ExecutionResult.failed(t);

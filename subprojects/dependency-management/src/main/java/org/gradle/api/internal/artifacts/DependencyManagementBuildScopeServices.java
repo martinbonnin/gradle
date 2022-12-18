@@ -208,6 +208,7 @@ import org.gradle.internal.vfs.VirtualFileSystem;
 import org.gradle.util.internal.BuildCommencedTimeProvider;
 import org.gradle.util.internal.SimpleMapInterner;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
@@ -628,7 +629,7 @@ class DependencyManagementBuildScopeServices {
         if (cacheDecoratorFactory instanceof CleaningInMemoryCacheDecoratorFactory) {
             listenerManager.addListener(new InternalBuildFinishedListener() {
                 @Override
-                public void buildFinished(GradleInternal build, boolean failed) {
+                public void buildFinished(GradleInternal build, @Nullable Throwable failure) {
                     ((CleaningInMemoryCacheDecoratorFactory) cacheDecoratorFactory).clearCaches(ComponentMetadataRuleExecutor::isMetadataRuleExecutorCache);
                 }
             });
@@ -650,7 +651,7 @@ class DependencyManagementBuildScopeServices {
     private void registerBuildFinishedHooks(ListenerManager listenerManager, DependencyVerificationOverride dependencyVerificationOverride) {
         listenerManager.addListener(new InternalBuildFinishedListener() {
             @Override
-            public void buildFinished(GradleInternal build, boolean failed) {
+            public void buildFinished(GradleInternal build, @Nullable Throwable failure) {
                 dependencyVerificationOverride.buildFinished(build);
             }
         });

@@ -144,6 +144,7 @@ import org.gradle.internal.work.WorkerThreadRegistry;
 import org.gradle.util.internal.SimpleMapInterner;
 import org.gradle.vcs.internal.VcsMappingsStore;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -449,8 +450,8 @@ public class DefaultDependencyManagementServices implements DependencyManagement
             if (startParameter.isWriteDependencyLocks()) {
                 listenerManager.addListener(new InternalBuildFinishedListener() {
                     @Override
-                    public void buildFinished(GradleInternal gradle, boolean failed) {
-                        if (!failed) {
+                    public void buildFinished(GradleInternal gradle, @Nullable Throwable failure) {
+                        if (failure == null) {
                             dependencyLockingProvider.buildFinished();
                         }
                     }
