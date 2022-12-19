@@ -25,10 +25,10 @@ import org.gradle.api.Incubating;
  * Parameter types should be interfaces, only declaring getters for {@link org.gradle.api.provider.Property}-like objects.
  * Example:
  * </p>
- * <pre class='autoTested'>
+ * <pre>
  * public interface MyFlowParameters extends FlowParameters {
- *     Property&lt;String&gt; getString();
- *     Property&lt;MyBuildService&gt; getBuildService();
+ *    Property&lt;String&gt; getString();
+ *   {@literal @}ServiceReference Property&lt;MyBuildService&gt; getBuildService();
  * }
  * </pre>
  *
