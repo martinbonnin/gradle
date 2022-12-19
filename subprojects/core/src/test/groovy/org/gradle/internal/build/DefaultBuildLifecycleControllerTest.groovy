@@ -533,6 +533,6 @@ class DefaultBuildLifecycleControllerTest extends Specification {
 
     private void expectBuildFinished(String action = "Build") {
         1 * buildBroadcaster.buildFinished({ it.failure == null && it.action == action })
-        1 * buildFinishedListener.buildFinished(_, false)
+        1 * buildFinishedListener.buildFinished(_, null)
     }
 }
