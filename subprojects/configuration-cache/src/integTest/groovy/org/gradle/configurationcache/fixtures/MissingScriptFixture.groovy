@@ -79,12 +79,12 @@ class MissingScriptFixture {
         this.settingsScript = settingsScript
     }
 
-    void createBuildScriptIn(TestFile dir) {
-        dir.file(buildScriptFileName) << buildScript
+    TestFile createBuildScriptIn(TestFile dir) {
+        return dir.file(buildScriptFileName) << buildScript
     }
 
-    void createSettingsScriptIn(TestFile dir) {
-        dir.file(settingsScriptFileName) << settingsScript
+    TestFile createSettingsScriptIn(TestFile dir) {
+        return dir.file(settingsScriptFileName) << settingsScript
     }
 
     String getBuildScriptFileName() {

@@ -17,7 +17,10 @@
 package org.gradle.configurationcache
 
 import org.gradle.configurationcache.fixtures.MissingScriptFixture
+import org.gradle.test.fixtures.file.TestFile
 import spock.lang.Issue
+
+import static org.gradle.util.internal.GFileUtils.relativePathOf
 
 @Issue("https://github.com/gradle/gradle/issues/18897")
 class ConfigurationCacheMissingScriptIntegrationTest extends AbstractConfigurationCacheIntegrationTest {
@@ -32,13 +35,14 @@ class ConfigurationCacheMissingScriptIntegrationTest extends AbstractConfigurati
         configurationCacheRun 'ok'
 
         then:
-        fixture.createBuildScriptIn(createDir('b'))
+        def buildScriptFile = fixture.createBuildScriptIn(createDir('b'))
+        def buildScriptFileRelativePath = relativePathOf(buildScriptFile)
 
         when:
         configurationCacheRun 'ok'
 
         then:
-        outputContains("Calculating task graph as configuration cache cannot be reused because file 'b/${fixture.buildScriptFileName}' has changed.")
+        outputContains("Calculating task graph as configuration cache cannot be reused because file '$buildScriptFileRelativePath' has changed.")
         result.assertTasksExecuted(":a:ok", ":b:ok")
 
         where:
@@ -58,13 +62,14 @@ class ConfigurationCacheMissingScriptIntegrationTest extends AbstractConfigurati
         configurationCacheRun 'ok'
 
         and:
-        fixture.createSettingsScriptIn(testDirectory)
+        def settingsScriptFile = fixture.createSettingsScriptIn(testDirectory)
+        def settingsScriptFileRelativePath = relativePathOf(settingsScriptFile)
 
         when:
         configurationCacheRun 'ok'
 
         then:
-        outputContains("Calculating task graph as configuration cache cannot be reused because file '${fixture.settingsScriptFileName}' has changed.")
+        outputContains("Calculating task graph as configuration cache cannot be reused because file '$settingsScriptFileRelativePath' has changed.")
         result.assertTasksExecuted(":ok", ":a:ok", ":b:ok")
 
         where:
@@ -78,19 +83,25 @@ class ConfigurationCacheMissingScriptIntegrationTest extends AbstractConfigurati
         fixture.createBuildScriptIn(createDir("buildSrc"))
         fixture.createBuildScriptIn(createDir("buildSrc/a"))
 
+
         and:
         configurationCacheRun 'ok'
 
         and:
-        fixture.createSettingsScriptIn(createDir("buildSrc"))
+        def settingsScriptFile = fixture.createSettingsScriptIn(createDir("buildSrc"))
+        def settingsScriptFileRelativePath = relativePathOf(settingsScriptFile)
 
         when:
         configurationCacheRun 'ok'
 
         then:
-        outputContains("Calculating task graph as configuration cache cannot be reused because file 'buildSrc/${fixture.settingsScriptFileName}' has changed.")
+        outputContains("Calculating task graph as configuration cache cannot be reused because file '$settingsScriptFileRelativePath' has changed.")
 
         where:
         missingScriptsSpec << MissingScriptFixture.specs('a')
+    }
+
+    private String relativePathOf(TestFile file) {
+        relativePathOf(file, testDirectory)
     }
 }
