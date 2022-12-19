@@ -68,6 +68,7 @@ public class IdentifyStep<C extends ExecutionRequestContext, R extends Result> e
             },
             BuildOperationDescriptor
                 .displayName("Identifying work")
+                .skipProgress(true)
                 .details(new Operation.Details() {
                     @Override
                     public Class<?> getWorkType() {

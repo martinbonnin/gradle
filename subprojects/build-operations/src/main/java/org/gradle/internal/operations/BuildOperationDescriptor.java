@@ -30,6 +30,7 @@ public final class BuildOperationDescriptor {
     private final Object details;
     private final BuildOperationMetadata metadata;
     private final int totalProgress;
+    private final boolean skipProgress;
 
     private BuildOperationDescriptor(
         @Nullable OperationIdentifier id,
@@ -39,7 +40,8 @@ public final class BuildOperationDescriptor {
         @Nullable String progressDisplayName,
         @Nullable Object details,
         BuildOperationMetadata metadata,
-        int totalProgress
+        int totalProgress,
+        boolean skipProgress
     ) {
         this.id = id;
         this.parentId = parentId;
@@ -49,6 +51,7 @@ public final class BuildOperationDescriptor {
         this.details = details;
         this.metadata = metadata;
         this.totalProgress = totalProgress;
+        this.skipProgress = skipProgress;
     }
 
     @Nullable
@@ -108,6 +111,10 @@ public final class BuildOperationDescriptor {
         return totalProgress;
     }
 
+    public boolean isSkipProgress() {
+        return skipProgress;
+    }
+
     public static Builder displayName(String displayName) {
         return new Builder(displayName);
     }
@@ -123,6 +130,7 @@ public final class BuildOperationDescriptor {
             ", details=" + details +
             ", metadata=" + metadata +
             ", totalProgress=" + totalProgress +
+            ", skipProgress=" + skipProgress +
             '}';
     }
 
@@ -134,6 +142,7 @@ public final class BuildOperationDescriptor {
         private BuildOperationRef parent;
         private BuildOperationMetadata metadata = BuildOperationMetadata.NONE;
         private int totalProgress;
+        private boolean skipProgress;
 
         private Builder(String displayName) {
             this.displayName = displayName;
@@ -165,6 +174,11 @@ public final class BuildOperationDescriptor {
             return this;
         }
 
+        public Builder skipProgress(boolean skipProgress) {
+            this.skipProgress = skipProgress;
+            return this;
+        }
+
         /**
          * Define the parent of the operation. Needs to be the state of an operations that is running at the same time
          * the described operation will run (see: {@code org.gradle.internal.operations.BuildOperationRunner#getCurrentOperation()}).
@@ -187,7 +201,7 @@ public final class BuildOperationDescriptor {
         }
 
         public BuildOperationDescriptor build(@Nullable OperationIdentifier id, @Nullable OperationIdentifier defaultParentId) {
-            return new BuildOperationDescriptor(id, parent == null ? defaultParentId : parent.getId(), name, displayName, progressDisplayName, details, metadata, totalProgress);
+            return new BuildOperationDescriptor(id, parent == null ? defaultParentId : parent.getId(), name, displayName, progressDisplayName, details, metadata, totalProgress, skipProgress);
         }
     }
 }

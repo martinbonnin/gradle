@@ -181,10 +181,9 @@ public class DefaultBuildOperationExecutor implements BuildOperationExecutor, St
         @Override
         public void start(BuildOperationDescriptor descriptor, BuildOperationState operationState) {
             buildOperationListener.started(descriptor, new OperationStartEvent(operationState.getStartTime()));
-            String progressDisplayName = descriptor.getProgressDisplayName();
-            if (progressDisplayName != null) {
+            if (!descriptor.isSkipProgress()) {
                 ProgressLogger progressLogger = progressLoggerFactory.newOperation(DefaultBuildOperationExecutor.class, descriptor);
-                this.progressLogger = progressLogger.start(descriptor.getDisplayName(), progressDisplayName);
+                this.progressLogger = progressLogger.start(descriptor.getDisplayName(), descriptor.getProgressDisplayName());
             }
         }
 
