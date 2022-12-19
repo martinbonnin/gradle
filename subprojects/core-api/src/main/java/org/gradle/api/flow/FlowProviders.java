@@ -35,12 +35,17 @@ public interface FlowProviders {
     /**
      * Returns a {@link Provider provider} for the summary of the result of executing the
      * {@link StartParameter#getTaskRequests() requested tasks}.
-     *
+     * <p>
      * The returned {@link Provider#get() provider's value} becomes available after all requested tasks
      * have completed - successfully or otherwise - or after a configuration phase failure prevents the execution
      * of the requested tasks.
+     * </p>
+     * <p>
+     * <b>IMPORTANT:</b> trying to access the provider's value before the requested tasks have finished will
+     * result in an error.
+     * </p>
      *
-     * <pre class='autoTested'>
+     * <pre>
      * /**
      *  * A settings plugin that plays an appropriate sound at the end of a build.
      *  *{@literal /}
