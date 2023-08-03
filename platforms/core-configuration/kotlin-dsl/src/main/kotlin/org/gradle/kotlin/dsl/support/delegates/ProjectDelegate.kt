@@ -103,7 +103,7 @@ abstract class ProjectDelegate : Project {
     override fun getLogger(): Logger =
         delegate.logger
 
-    @Deprecated("Use layout.buildDirectory instead", ReplaceWith("layout.buildDirectory.get()"))
+    @Deprecated("Use layout.buildDirectory instead", ReplaceWith("layout.buildDirectory.asFile.get()"))
     override fun getBuildDir(): File =
         @Suppress("DEPRECATION")
         delegate.buildDir
